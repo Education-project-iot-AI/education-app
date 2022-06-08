@@ -31,6 +31,7 @@ def handle_clnt(clnt_sock):
 
         if clnt_msg.startswith('!'):            # 특정 기능 실행 시 @ 붙여서 받음
             clnt_msg = clnt_msg.replace('!', '')
+            clas.Menu.move_to(clnt_msg)
         else:
             continue
 
