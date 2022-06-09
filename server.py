@@ -13,6 +13,18 @@ msg = ''
 lock = threading.Lock()
 
 
+def delete_imfor(clnt_sock):
+    global clnt_cnt
+    for i in range(0, clnt_cnt):
+        if clnt_sock == clnt_info[i][0]:
+            print('exit client')
+            while i < clnt_cnt - 1:
+                clnt_info[i] = clnt_info[i + 1]
+                i += 1
+            break
+    clnt_cnt -= 1
+
+
 def handle_clnt(clnt_sock):
     lock.acquire()
     for i in range(0, clnt_cnt):                # clnt_info에 해당 클라이언트가 몇 번째에 있는지 추출
@@ -26,12 +38,15 @@ def handle_clnt(clnt_sock):
         print(clnt_msg)
         if not clnt_msg:                        # 클라이언트 연결 끊길 시
             lock.acquire()
+            delete_imfor(clnt_sock)
             lock.release()
             break
 
         if clnt_msg.startswith('!'):            # 특정 기능 실행 시 @ 붙여서 받음
             clnt_msg = clnt_msg.replace('!', '')
-            clas.Menu.move_to(clnt_msg)
+            if clnt_msg.startswith('login'):
+                clnt_msg = clnt_msg.replace('login', '')
+                clas.Menu.log_in(clnt_sock, clnt_msg, clnt_info)
         else:
             continue
 

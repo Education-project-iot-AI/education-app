@@ -9,11 +9,13 @@ def dbcon():
 
 
 con, c = dbcon()
-
-c.execute("SELECT DISTINCT teacher.ID, student.ID From teacher LEFT JOIN student ON teacher.ID != student.ID")
 imfor = "213"
+pw ="123"
+c.execute("SELECT PW From teacher WHERE ID=?",(imfor,))
+
 for row in c:  # id 컬럼
-    if imfor in row:       # 클라이언트가 입력한 id가 DB에 있으면
+    print(row)
+    if pw in row:       # 클라이언트가 입력한 id가 DB에 있으면
         print("안돼")
         ck_login = 1
         break
