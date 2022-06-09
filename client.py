@@ -8,11 +8,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from xml.etree.ElementTree import fromstring
 
-# 수신 스레드, 스레드 시그널, 시그널 선언, 수신 슬롯
-# 유사 로그인
-# 회원 가입 ID 입력란 시그널 - 디스에이블 체크
-# 채팅 연결 준비
-
 
 clientui = uic.loadUiType("tonghap.ui")[0]  # ui 불러오기
 server_ip = '127.0.0.1'  # 서버 ip (임시로 루프백)
@@ -45,25 +40,19 @@ birdcodelist = ['A000001149', 'A000001150', 'A000001151', 'A000001152', 'A000001
 
 
 class Main(QMainWindow, clientui):  # 메인 클래스
-    rcv_idcheck_ok = pyqtSignal()  # 이하 시그널 선언
-    rcv_idcheck_no = pyqtSignal()
-    rcv_logintcheck_ok = pyqtSignal()
-    rcv_loginscheck_ok = pyqtSignal()
-    rcv_logincheck_no = pyqtSignal()
-
     def __init__(self):  # 이니셜라이저
         super().__init__()  # 상속
         self.setupUi(self)  # ui 로딩
         self.stackedWidget.setCurrentIndex(0)  # 초기 페이지 설정
-        self.cdr = ClientDataRecv()  # 데이터 수신 스레드 선언
         self.btn_connect()  # 버튼 연결 함수 호출
         self.client_ready()  # 클라이언트 초기 함수 호출
 
-        self.cdr.rcv_idcheck_ok.connect(self.join_idcheck_ok)  # 데이터 수신 대기 스레드의 ID 중복확인 ok 시그널 선언
-        self.cdr.rcv_idcheck_no.connect(self.join_idcheck_no)  # 데이터 수신 대기 스레드의 ID 중복확인 no 시그널 선언
-        self.cdr.rcv_logintcheck_ok.connect(self.rcv_logintcheck_ok)  # 데이터 수신 대기 스레드의 교사로그인확인 ok 시그널 선언
-        self.cdr.rcv_loginscheck_ok.connect(self.rcv_loginscheck_ok)  # 데이터 수신 대기 스레드의 학생로그인확인 ok 시그널 선언
-        self.cdr.rcv_logincheck_no.connect(self.rcv_logincheck_no)  # 데이터 수신 대기 스레드의 로그인확인 no 시그널 선언
+    def rcv_ready(self):
+        while True:
+            rcv = s_skt.recv(1024)
+            if sys.getsizeof(rcv) > 0:
+                break
+        return rcv.decode()
 
     def client_ready(self):  # 클라이언트 초기 함수
         s_skt.connect((server_ip, int(portnumber)))  # 서버 소켓 커넥트
@@ -106,29 +95,6 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         else:  # ID가 존재하고 금지어도 포함되어 있지 않으면
             sendid = '!idcheck' + '/' + self.line_join_id.text()  # !idcheck 헤더 붙여서 (확정 아님)
             s_skt.send(sendid.encode())  # 서버로 송신
-
-    @pyqtSlot()
-    def join_idcheck_ok(self):
-        self.btn_join_confirm.setEnabled(True)
-
-    @pyqtSlot()
-    def join_idcheck_no(self):
-        QMessageBox.warning(self, '사용 불가 ID', '사용할 수 없는 ID입니다')
-        self.line_join_id.clear()
-
-    @pyqtSlot()
-    def join_logintcheck_ok(self):
-        self.btn_join_confirm.setEnabled(True)
-
-    @pyqtSlot()
-    def join_loginscheck_ok(self):
-        self.btn_join_confirm.setEnabled(True)
-
-    @pyqtSlot()
-    def join_logincheck_no(self):
-        QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해주세요')
-        self.line_login_id.clear()
-        self.line_login_pw.clear()
 
     def join_confirm(self):  # 회원 가입 - 회원 가입 확정 함수
         if not self.line_join_id.text() or not self.line_join_pw.text() or not self.line_join_name.text():  # 입력란이 비었으면
@@ -185,47 +151,6 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.text_study_info.clear()  # 정보란 초기화
         self.text_study_name.append(bird_data[1][0][6].text)  # 이름란 이름 표시
         self.text_study_info.append(bird_data[1][0][16].text)  # 정보란 정보 표시
-
-
-class ClientDataRecv(QThread):  # 데이터 수신 대기 스레드 - 다른 프로젝트에서 썼던 코드를 그대로 들어다 박은 거라 거의 다 고칠겁니다
-    rcv_idcheck_ok = pyqtSignal()  # 이하 시그널 선언
-    rcv_idcheck_no = pyqtSignal()
-    rcv_logintcheck_ok = pyqtSignal()
-    rcv_loginscheck_ok = pyqtSignal()
-    rcv_logincheck_no = pyqtSignal()
-
-    def __init__(self):  # 이니셜라이저
-        super().__init__()  # 상속
-
-    def run(self):  # 실행 함수
-        while True:  # 무한 루프
-            # s_skt = Main.server_addr[0]  # 서버 소켓을 서버 주소 리스트에서 추출
-            try:  # 예외 처리 준비
-                rcv_msg = s_skt.recv(1024).decode()
-                print(f'받은 값 : {rcv_msg}')
-                # rcv_msg = pickle.loads(s_skt.recv(1024))  # 서버 소켓에서 수신한 데이터 디코드
-            except EOFError:  # 접속이 끊긴 경우
-                print('EOF Error?')
-                continue
-                # break  # 루프 종료
-            else:  # 예외가 발생하지 않았다면
-                if '!idcheckok' in rcv_msg:  # 수신 메시지에 ID 중복확인 ok 헤더가 있으면
-                    print('!idcheckok')
-                    self.rcv_idcheck_ok.emit()  # ID 중복확인 ok 시그널 발신인
-                elif '!idcheckno' in rcv_msg:  # 수신 메시지에 ID 중복확인 no 헤더가 있으면
-                    print('!idcheckno')
-                    self.rcv_idcheck_no.emit()  # ID 중복확인 no 시그널 발신
-                elif '!logintok' in rcv_msg:  # 수신 메시지에 교사로그인확인 ok 헤더가 있으면
-                    print('!logintok')
-                    self.rcv_logintcheck_ok.emit()  # 로그인확인 교사로그인확인 ok 시그널 발신
-                elif '!loginsok' in rcv_msg:  # 수신 메시지에 학생로그인확인 ok 헤더가 있으면
-                    print('!loginsok')
-                    self.rcv_loginscheck_ok.emit()  # 로그인확인 학생로그인확인 ok 시그널 발신
-                elif '!logincheckno' in rcv_msg:  # 수신 메시지에 로그인확인 no 헤더가 있으면
-                    print('!loginno')
-                    self.rcv_logincheck_no.emit()  # 로그인확인 no 시그널 발신
-        print('서버 연결 종료')  # 루프 종료시 연결 종료 디버그 메시지 출력
-        s_skt.close()  # 서버 소켓 종료
 
 
 if __name__ == "__main__":  # 이하 생략
