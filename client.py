@@ -3,8 +3,8 @@ import requests
 import random
 from socket import *
 from PyQt5 import uic, QtCore
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+# from PyQt5.QtGui import *
+# from PyQt5.QtCore import *  # 계속 안 쓰면 삭제 예정
 from PyQt5.QtWidgets import *
 from xml.etree.ElementTree import fromstring
 
@@ -36,38 +36,40 @@ birdcodelist = ['A000001149', 'A000001150', 'A000001151', 'A000001152', 'A000001
                 'A000001361', 'A000001362', 'A000001365', 'A000001366', 'A000001367', 'A000001368', 'A000001369',
                 'A000001370', 'A000001371', 'A000001372', 'A000001374', 'A000001376', 'A000001377', 'A000001383',
                 'A000001384', 'A000001386', 'A000001387', 'A000001388', 'A000001390', 'A000001391', 'A000001393',
-                'A000001394', 'A000001395', 'A000001397']  # 학습 & 출제 대상 코드 리스트
+                'A000001394', 'A000001395', 'A000001397']  # 학습 & 출제 대상 코드 리스트 (변경 or 삭제 예정)
+s_skt.connect((server_ip, int(portnumber)))  # 서버 소켓 커넥트
 
 
 class Main(QMainWindow, clientui):  # 메인 클래스
     def __init__(self):  # 이니셜라이저
         super().__init__()  # 상속
-        self.setupUi(self)  # ui 로딩
+        self.setupUi(self)  # ui 로딩결
         self.stackedWidget.setCurrentIndex(0)  # 초기 페이지 설정
         self.btn_connect()  # 버튼 연결 함수 호출
-        self.client_ready()  # 클라이언트 초기 함수 호출
 
     def rcv_ready(self):
         while True:
             rcv = s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
+                print(f'받은 것 : {rcv.decode()}')  # 디버그-확인용 출력
                 break
         return rcv.decode()
 
-    def client_ready(self):  # 클라이언트 초기 함수
-        s_skt.connect((server_ip, int(portnumber)))  # 서버 소켓 커넥트
-        self.cdr.start()  # 데이터 수신 대기 스레드 시작
+    def rcv_pageswap(self):  # 페이지 전환할 때 마다 0, 1 신호를 받아서 상담 신청 있는지 체크함 (상담 요청 수신 신호는 생략)
+        rcv = s_skt.recv(1024)
+        if rcv == '0':
+            pass
+        else:
+            pass  # 상담 요청 있음을 알리는 함수 들어갈 자리
 
     def btn_connect(self):  # 버튼 연결 함수
-        self.btn_join.clicked.connect(self.join_start)  # 메인 화면, 회원 가입 연결
-        # self.btn_login.clicked.connect(self.join_start)
+        self.btn_join.clicked.connect(self.join_start)  # 메인 페이지, 회원 가입 버튼 연결
+        self.btn_login.clicked.connect(self.login_start)  # 메인 페이지, 로그인 버튼 연결
 
-        self.btn_debug_t.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))  # 메인 화면, 디버그-교사로그인 연결
-        self.btn_debug_s.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))  # 메인 화면, 디버그-학생로그인 연결
-
-        self.btn_join_backmain.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))  # 회원 가입, 돌아가기 연결
-        self.btn_join_id_check.clicked.connect(self.join_idcheck)  # 회원 가입, ID 중복 체크 확인
-        self.btn_join_confirm.clicked.connect(self.join_confirm)  # 회원 가입, ID 중복 체크 확인
+        self.btn_join_backmain.clicked.connect(self.join_back_main)  # 회원 가입 페이지, 돌아가기 연결
+        self.btn_join_id_check.clicked.connect(self.join_idcheck)  # 회원 가입 페이지, ID 중복 체크 연결
+        self.btn_join_confirm.clicked.connect(self.join_confirm)  # 회원 가입 페이지, 회원 가입 연결
+        self.line_join_id.textChanged.connect(lambda: self.btn_join_confirm.setDisabled(True))  # 회원 가입 페이지, ID 변경 시 회원 가입 버튼 비활성화
 
         self.btn_t_logout.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))  # 교사 페이지, 로그아웃(돌아가기) 연결
 
@@ -78,65 +80,101 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.btn_s_study_on.clicked.connect(self.student_study)  # 학습하기 페이지, 학습 자료 보기 연결
 
     def join_start(self):  # 회원 가입 - 페이지 초기화 함수
+        s_skt.send('!join'.encode())  # 서버로 송신
         self.stackedWidget.setCurrentIndex(1)  # 회원 가입 페이지로 전환
-        for i in ['id', 'pw', 'pw_check', 'name']:  # 회원 가입 페이지의 라인 초기화
-            exec(f'self.line_join_{i}.clear()')
+        self.line_join_id.clear()  # 회원 가입 페이지의 라인 초기화
+        self.line_join_pw.clear()
+        self.line_join_pw_check.clear()
+        self.line_join_name.clear()
         self.btn_join_confirm.setDisabled(True)  # 회원 가입 버튼 비활성화
         self.radio_join_t.setChecked(False)  # 이하 회원 속성 라디오 버튼 초기화
         self.radio_join_s.setChecked(False)
 
     def join_idcheck(self):  # 회원 가입 - 아이디 중복 체크 함수
-        if not self.line_join_id.text():  # ID 란이 비었으면
+        idt = self.line_join_id.text()
+        if not idt:  # ID 란이 비었으면
             QMessageBox.warning(self, 'ID 입력', 'ID를 입력하셔야 합니다')  # 경고 메시지 출력
             self.line_join_id.clear()  # ID 란 초기화
-        elif self.forbidden_word_check(self.line_join_id.text()):  # 금지어가 포함되어 있으면
+        elif ' ' in idt or '?' in idt or '/' in idt or '|' in idt:  # 금지어가 포함되어 있으면
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
             self.line_join_id.clear()
         else:  # ID가 존재하고 금지어도 포함되어 있지 않으면
             sendid = '!idcheck' + '/' + self.line_join_id.text()  # !idcheck 헤더 붙여서 (확정 아님)
             s_skt.send(sendid.encode())  # 서버로 송신
+            rcv = self.rcv_ready()
+            if rcv == '!ok':
+                QMessageBox.about(self, '사용 가능 ID', '사용이 가능한 ID입니다')  # 알림 메시지 출력
+                self.btn_join_confirm.setEnabled(True)
+            else:
+                QMessageBox.warning(self, '사용 불가 ID', '이미 사용 중인 ID입니다')  # 경고 메시지 출력
+                self.line_join_id.clear()
 
     def join_confirm(self):  # 회원 가입 - 회원 가입 확정 함수
-        if not self.line_join_id.text() or not self.line_join_pw.text() or not self.line_join_name.text():  # 입력란이 비었으면
+        idt = self.line_join_id.text()
+        pwt = self.line_join_pw.text()
+        pct = self.line_join_pw_check.text()
+        nmt = self.line_join_name.text()
+        if not idt or not pwt or not nmt:  # 입력란이 비었으면
             QMessageBox.warning(self, '입력 누락', '모든 정보를 입력해야 합니다')  # 경고 메시지 출력
-        elif self.forbidden_word_check(self.line_join_id.text())\
-                or self.forbidden_word_check(self.line_join_pw.text())\
-                or self.forbidden_word_check(self.line_join_name.text()):
+        elif ' ' in idt or '?' in idt or '/' in idt or '|' in idt\
+                or ' ' in pwt or '?' in pwt or '/' in pwt or '|' in pwt\
+                or ' ' in nmt or '?' in nmt or '/' in nmt or '|' in nmt:
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')  # 경고 메시지 출력
-            self.join_clear()  # 금지어 포함 입력란 초기화 함수 호출
-        elif self.line_join_pw.text() != self.line_join_pw_check.text():  # 비밀번호와 비밀번호 확인이 일치하지 않으면
+            if ' ' in idt or '?' in idt or '/' in idt or '|' in idt:
+                self.line_join_id.clear()
+            if ' ' in pwt or '?' in pwt or '/' in pwt or '|' in pwt:
+                self.line_join_pw.clear()
+            if ' ' in nmt or '?' in nmt or '/' in nmt or '|' in nmt:
+                self.line_join_name.clear()
+        elif pwt != pct:  # 비밀번호와 비밀번호 확인이 일치하지 않으면
             QMessageBox.warning(self, '비밀번호 불일치', '비밀번호를 다시 한번 확인해 주세요')  # 경고 메시지 출력
-            self.join_clear()  # 금지어 포함 입력란 초기화 함수 호출
+            if ' ' in idt or '?' in idt or '/' in idt or '|' in idt:
+                self.line_join_id.clear()
+            if ' ' in pwt or '?' in pwt or '/' in pwt or '|' in pwt:
+                self.line_join_pw.clear()
+            if ' ' in nmt or '?' in nmt or '/' in nmt or '|' in nmt:
+                self.line_join_name.clear()
         else:  # 금지어도 없고 비밀번호 확인도 일치하면
             if self.radio_join_t.isChecked():  # 교사 회원이 체크되어 있을 때
-                joindata = '!newteacher' + '/' + self.line_join_id.text() +\
-                           '/' + self.line_join_pw.text() + '/' + self.line_join_name.text()  # 교사회원 헤더 붙여서(확정 아님)
+                joindata = '!joindata' + '/' + self.line_join_id.text() +\
+                           '/' + self.line_join_pw.text() + '/' + self.line_join_name.text() + '/t'  # 교사 꼬리 붙여서
                 s_skt.send(joindata.encode())  # 송신
                 QMessageBox.about(self, '회원 가입 완료', '회원 가입이 완료되었습니다')  # 완료 메시지 출력
-                self.stackedWidget.setCurrentIndex(0)  # 메인 페이지로 이동
             elif self.radio_join_s.isChecked():  # 학생 회원이 체크되어 있을 때
-                joindata = '!newstudent' + '/' + self.line_join_id.text() +\
-                           '/' + self.line_join_pw.text() + '/' + self.line_join_name.text()  # 이하 동일
+                joindata = '!joindata' + '/' + self.line_join_id.text() +\
+                           '/' + self.line_join_pw.text() + '/' + self.line_join_name.text() + '/s'  # 이하 동일
                 s_skt.send(joindata.encode())
                 QMessageBox.about(self, '회원 가입 완료', '회원 가입이 완료되었습니다')
-                self.stackedWidget.setCurrentIndex(0)
             else:  # 라디오 버튼이 체크되어 있지 않을 때
                 QMessageBox.warning(self, '회원 선택', '교사 회원 / 학생 회원을 선택해 주세요')  # 경고 메시지 출력
 
-    def forbidden_word_check(self, text):
-        if ' ' in text or '?' in text or '/' in text or '|' in text:
-            return True
-        else:
-            return False
+    def join_back_main(self):
+        s_skt.send('!Q_join'.encode())  # 회원 가입 창을 나갈 때 !Q_join 전송할 것
+        self.stackedWidget.setCurrentIndex(0)
 
-    def join_clear(self):  # 금지어 포함 입력란 초기화 함수
-        self.line_join_pw_check.clear()
-        if self.forbidden_word_check(self.line_join_id.text()):
-            self.line_join_id.clear()
-        if self.forbidden_word_check(self.line_join_pw.text()):
-            self.line_join_pw.clear()
-        if self.forbidden_word_check(self.line_join_name.text()):
-            self.line_join_name.clear()
+    def login_start(self):
+        if self.radio_login_t.isChecked():  # 교사 회원이 체크되어 있을 때
+            joindata = '!logint' + '/' + self.line_login_id.text() + '/' + self.line_login_pw.text()  # 교사 헤더 붙여서
+            s_skt.send(joindata.encode())  # 송신
+            rcv = self.rcv_ready()
+            if rcv == '!OK':
+                QMessageBox.about(self, '로그인 성공', '로그인을 환영합니다')
+                self.stackedWidget.setCurrentIndex(2)
+            else:
+                QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해 주세요')
+        elif self.radio_login_s.isChecked():  # 학생 회원이 체크되어 있을 때
+            joindata = '!logins' + '/' + self.line_join_id.text() + '/' + self.line_join_pw.text()  # 학생 헤더 동일
+            s_skt.send(joindata.encode())
+            rcv = self.rcv_ready()
+            if rcv == '!OK':
+                QMessageBox.about(self, '로그인 성공', '로그인을 환영합니다')
+                self.stackedWidget.setCurrentIndex(3)
+            else:
+                QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해 주세요')
+        else:
+            QMessageBox.warning(self, '로그인 오류', '회원 종류를 반드시 선택해 주세요')
+
+    # 이하 임시 땜빵
 
     def student_study_start(self):  # 학습하기 페이지 초기 함수
         self.text_study_name.clear()  # 이름란 초기화
