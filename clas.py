@@ -142,11 +142,14 @@ class Menu:
                 Quizs = Quizs + quiz + ' | '  # 하나로 합친다
             sock.send(Quizs.encode())  # 전송한다
 
-            Quizs = Quizs.split(' | ')  # 문제를 맞출때를 생각하여 미리 문제를 리스트로 나눠둔다
+            Quiz_list = Quizs.split(' | ')  # 문제를 맞출때를 생각하여 미리 문제를 리스트로 나눠둔다
 
             while True:  # 선생님이 퀴즈를 만들거나 학생이 맞추는 함수
                 Q_msg = sock.recv(BUF_SIZE)
                 Q_msg = Q_msg.decode()
+
+                if Q_msg.startswith('!quizend/'):  # 나간다고 할시
+                    break
 
                 # 만약 선생이면서 !aadd/를 시작으로 입력이 들어올때
                 if Q_msg.startswith('!aadd/') and 't' == info[n][5]:
@@ -158,8 +161,21 @@ class Menu:
                     con.commit()            # DB에 커밋
                     con.close()
 
-                if Q_msg.startswith('!aadd/') and 's' == info[n][5]:
+                if Q_msg.startswith('!quizlist/') and 's' == info[n][5]:
+                    Q_msg = Q_msg.replace('!quizlist/', '')
+                    sock.send(Quizs.encode())  # 문제 전송
+
+                if Q_msg.startswith('!quizstart/') and 's' == info[n][5]:
+                    Q_msg = Q_msg.replace('!quizstart/', '')  # 문제를 푼다고 할 시
+                    Q_msg = Q_msg.split('/')  # 문제/입력한 답을 리스트화
+                    for i in Quiz_list:
+                        if Q_msg[0] == i[0] and Q_msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
+                            ck_answer = 1
+                            break
+                    if ck_answer == 1:
+                        sock.send('!OK'.encode())  # 맞췃다고 알려줌
+                    else:
+                        sock.send('!NO'.encode())  # 틀렷다고 알려줌
                     # 서버에서 보내준 정답을 받을곳
-                    a = 'defult'
 
         # 문제관련 함수 끝
