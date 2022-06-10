@@ -132,29 +132,29 @@ class Menu:
         if 'check' in msg:
             Quizs = ''
             con, c = dbcon()
-            c.execute("SELECT who,Quiz,Answer FROM quiz")
+            c.execute("SELECT who,Quiz,Answer FROM quiz")  # 누구에게/문제/답 을 가져온다
             while True:
-                data = c.fetchone()
+                data = c.fetchone()  # 한 행 추출
                 if data is None:
                     break
                 data = list(data)
-                quiz = ','.join(data)
-                Quizs = Quizs + quiz + ' | '
-            sock.send(Quizs.encode())
+                quiz = ','.join(data)  # 리스트를 문자열화 킨다
+                Quizs = Quizs + quiz + ' | '  # 하나로 합친다
+            sock.send(Quizs.encode())  # 전송한다
 
-            Quizs = Quizs.split(' | ')
+            Quizs = Quizs.split(' | ')  # 문제를 맞출때를 생각하여 미리 문제를 리스트로 나눠둔다
 
             while True:  # 선생님이 퀴즈를 만들거나 학생이 맞추는 함수
                 Q_msg = sock.recv(BUF_SIZE)
                 Q_msg = Q_msg.decode()
 
+                # 만약 선생이면서 !aadd/를 시작으로 입력이 들어올때
                 if Q_msg.startswith('!aadd/') and 't' == info[n][5]:
-                    Q_msg = Q_msg.replace('!aadd/', '')
-                    Q_msg = Q_msg.split('/')
-                    print(Q_msg)
+                    Q_msg = Q_msg.replace('!aadd/', '')  # aadd를 지워주고
+                    Q_msg = Q_msg.split('/')  # 리스트화 시킨뒤
 
                     query = "INSERT INTO quiz(who,Quiz,Answer) VALUES(?, ?, ?)"
-                    c.executemany(query, (Q_msg,))
+                    c.executemany(query, (Q_msg,))  # 데이터베이스에 누가/무슨 문제를/답 을 넣는다
                     con.commit()            # DB에 커밋
                     con.close()
 
