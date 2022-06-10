@@ -1,13 +1,11 @@
-import sys
 import socket
 import threading
-import sqlite3
 import clas
 
 clnt_sock = []
-clnt_info = []  # [sock, id, type, state]
+clnt_info = []  # [sock, id, type,]
 clnt_cnt = 0
-PORT = 3022
+PORT = 3026
 BUF_SIZE = 1024
 msg = ''
 lock = threading.Lock()
@@ -50,13 +48,15 @@ def handle_clnt(clnt_sock):
                 clnt_msg = clnt_msg.replace('login', '')
                 clnt_info = clas.Join_n_login.log_in(
                     clnt_sock, clnt_msg, clnt_info, clnt_num)
+                print(clnt_info)
+                print(clnt_info[0][2])
             if clnt_msg.startswith('join'):
                 clnt_msg = clnt_msg.replace('join', '')
                 clnt_cnt = clas.Join_n_login.join(clnt_sock, clnt_cnt)
 
-            if clnt_msg.startswith('qnachack'):
-                clnt_msg = clnt_msg.replace('qnachack', '')
-                clas.Menu.join(clnt_sock, clnt_msg, clnt_info)
+            if clnt_msg.startswith('quiz'):
+                clnt_msg = clnt_msg.replace('quiz', '')
+                clas.Menu.Quiz(clnt_msg, clnt_info, clnt_num)
         else:
             continue
 

@@ -4,7 +4,7 @@ import socket
 
 BUF_SIZE = 2048
 IP = "127.0.0.1"
-Port = 3022
+Port = 3026
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((IP, Port))
 
