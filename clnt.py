@@ -1,4 +1,5 @@
 import sys
+import threading
 import socket
 
 BUF_SIZE = 2048
@@ -7,8 +8,18 @@ Port = 3022
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((IP, Port))
 
+
+def recv(sock):
+    while True:
+        a = sock.recv(BUF_SIZE)
+        a = a.decode()
+        if sys.getsizeof(a) >= 1:
+            print(a)
+
+
+t = threading.Thread(target=recv, args=(sock,))
+t.start()
+
 while True:
     msg = input("입력 : ")
     sock.send(msg.encode())
-    if len(msg) >= 1:
-        print(msg)

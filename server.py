@@ -13,7 +13,7 @@ msg = ''
 lock = threading.Lock()
 
 
-def delete_imfor(clnt_sock):
+def delete_imfor(clnt_sock):  # 클라이언트 접속해제
     global clnt_cnt
     for i in range(0, clnt_cnt):
         if clnt_sock == clnt_info[i][0]:
@@ -23,9 +23,11 @@ def delete_imfor(clnt_sock):
                 i += 1
             break
     clnt_cnt -= 1
+# 접속해제 종료
 
 
 def handle_clnt(clnt_sock):
+    global clnt_info, clnt_cnt
     lock.acquire()
     for i in range(0, clnt_cnt):                # clnt_info에 해당 클라이언트가 몇 번째에 있는지 추출
         if clnt_info[i][0] == clnt_sock:
@@ -42,11 +44,19 @@ def handle_clnt(clnt_sock):
             lock.release()
             break
 
-        if clnt_msg.startswith('!'):            # 특정 기능 실행 시 @ 붙여서 받음
+        if clnt_msg.startswith('!'):            # 특정 기능 실행 시 ! 붙여서 받음
             clnt_msg = clnt_msg.replace('!', '')
             if clnt_msg.startswith('login'):
                 clnt_msg = clnt_msg.replace('login', '')
-                clas.Menu.log_in(clnt_sock, clnt_msg, clnt_info)
+                clnt_info = clas.Join_n_login.log_in(
+                    clnt_sock, clnt_msg, clnt_info, clnt_num)
+            if clnt_msg.startswith('join'):
+                clnt_msg = clnt_msg.replace('join', '')
+                clnt_cnt = clas.Join_n_login.join(clnt_sock, clnt_cnt)
+
+            if clnt_msg.startswith('qnachack'):
+                clnt_msg = clnt_msg.replace('qnachack', '')
+                clas.Menu.join(clnt_sock, clnt_msg, clnt_info)
         else:
             continue
 
