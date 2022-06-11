@@ -33,11 +33,39 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.line_join_id.textChanged.connect(lambda: self.btn_join_confirm.setDisabled(True))
         # 교사 페이지
         self.btn_t_logout.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))  # 디버그-로그아웃(돌아가기) 연결
+        self.btn_t_quiz.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))
+        self.btn_t_qna.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
+        self.btn_t_counsel.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(5))
+        self.btn_t_info.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(6))
+        # 문제 출제 페이지
+        self.btn_t_quiz_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_t_quiz_add.clicked.connect(self.quiz_add)
+        # Q&A 답변 페이지
+        self.btn_t_qna_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_t_qna_solve.clicked.connect(self.qna_solve)
+        # 상담 수락 페이지
+        self.btn_t_counsel_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_t_counsel_ok.clicked.connect(self.counsel_ok)
+        # 통계보기 페이지
+        self.btn_t_info_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_t_info_show.clicked.connect(self.info_show)
         # 학생 페이지
         self.btn_s_logout.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))  # 디버그-로그아웃(돌아가기) 연결
+        self.btn_s_quiz.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(8))
+        self.btn_s_qna.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(9))
+        self.btn_s_counsel.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(10))
         self.btn_s_study.clicked.connect(self.student_study_start)  # 학습하기 연결
+        # 문제 풀기 페이지
+        self.btn_s_quiz_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
+        self.btn_s_quiz_solve.clicked.connect(self.quiz_solve)
+        # Q&A 질문 페이지
+        self.btn_s_qna_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
+        self.btn_s_qna_add.clicked.connect(self.qna_add)
+        # 상담 요청 페이지
+        self.btn_s_counsel_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
+        self.btn_s_counsel_call.clicked.connect(self.counsel_call)
         # 학습하기 페이지
-        self.btn_s_study_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))  # 돌아가기 연결
+        self.btn_s_study_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))  # 돌아가기 연결
         self.btn_s_study_on.clicked.connect(self.student_study)  # 학습 자료 보기 연결
         # 버튼/시그널 연결 끝
         self.btn_login.setDisabled(True)
@@ -149,9 +177,10 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.line_login_pw.clear()
 
     def login_start(self):
-        if ' ' in self.line_login_id.text() or '?' in self.line_login_id.text() or '/' in self.line_login_id.text()\
-                or '|' in self.line_login_id.text() or ' ' in self.line_login_pw.text()\
-                or '?' in self.line_login_pw.text() or '/' in self.line_login_pw.text() or '|' in self.line_login_pw.text():
+        if ' ' in self.line_login_id.text() or '?' in self.line_login_id.text()\
+                or '/' in self.line_login_id.text() or '|' in self.line_login_id.text()\
+                or ' ' in self.line_login_pw.text() or '?' in self.line_login_pw.text()\
+                or '/' in self.line_login_pw.text() or '|' in self.line_login_pw.text():
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')  # 경고 메시지 출력
             if ' ' in self.line_login_id.text() or '?' in self.line_login_id.text()\
                     or '/' in self.line_login_id.text() or '|' in self.line_login_id.text():
@@ -169,6 +198,15 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             if rcv.decode() == '!OK':
                 QMessageBox.about(self, '로그인 성공', '로그인을 환영합니다')
                 # self.rcv_pageswap()  # 페이지 전환 시 상담 요청 있는지 체크하는 함수
+                self.btn_login.setDisabled(True)
+                self.radio_login_t.setAutoExclusive(False)
+                self.radio_login_s.setAutoExclusive(False)
+                self.radio_login_t.setChecked(False)
+                self.radio_login_s.setChecked(False)
+                self.radio_login_t.setAutoExclusive(True)
+                self.radio_login_s.setAutoExclusive(True)
+                self.line_login_id.clear()
+                self.line_login_pw.clear()
                 self.stackedWidget.setCurrentIndex(2)
             else:
                 QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해 주세요')
@@ -185,17 +223,47 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 self.line_login_pw.clear()
             else:
                 QMessageBox.about(self, '로그인 성공', '로그인을 환영합니다')
-                self.stackedWidget.setCurrentIndex(3)
+                self.btn_login.setDisabled(True)
+                self.radio_login_t.setAutoExclusive(False)
+                self.radio_login_s.setAutoExclusive(False)
+                self.radio_login_t.setChecked(False)
+                self.radio_login_s.setChecked(False)
+                self.radio_login_t.setAutoExclusive(True)
+                self.radio_login_s.setAutoExclusive(True)
+                self.line_login_id.clear()
+                self.line_login_pw.clear()
+                self.stackedWidget.setCurrentIndex(7)
                 # self.study_list = rcv  # 수신한 학습 정보를 학습 내역 변수로 이동 (예정)
         else:
             QMessageBox.warning(self, '로그인 오류', '회원 종류를 반드시 선택해 주세요')
 
     # 이하 임시 땜빵
 
+    def quiz_add(self):
+        pass
+
+    def qna_solve(self):
+        pass
+
+    def counsel_ok(self):
+        pass
+
+    def info_show(self):
+        pass
+
+    def quiz_solve(self):
+        pass
+
+    def qna_add(self):
+        pass
+
+    def counsel_call(self):
+        pass
+
     def student_study_start(self):  # 학습하기 페이지 초기 함수
         self.text_study_name.clear()  # 이름란 초기화
         self.text_study_info.clear()  # 정보란 초기화
-        self.stackedWidget.setCurrentIndex(4)  # 학습하기 페이지로 전환
+        self.stackedWidget.setCurrentIndex(11)  # 학습하기 페이지로 전환
 
     def student_study(self):  # 학습하기 함수
         birdcodelist = ['A000001149', 'A000001150', 'A000001151', 'A000001152', 'A000001153', 'A000001154',
