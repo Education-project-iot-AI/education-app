@@ -52,9 +52,11 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.btn_t_quiz_check.clicked.connect(self.quiz_check)
         # Q&A 답변 페이지
         self.btn_t_qna_back.clicked.connect(self.qna_back_t)
+        self.btn_t_qna_check.clicked.connect(self.qna_check_t)
         self.btn_t_qna_solve.clicked.connect(self.qna_solve)
         # 상담 수락 페이지
         self.btn_t_counsel_back.clicked.connect(self.counsel_back_t)
+        self.btn_t_snd.clicked.connect(self.counsel_snd_t)
         self.btn_t_counsel_ok.clicked.connect(self.counsel_ok)
         # 통계보기 페이지
         self.btn_t_info_back.clicked.connect(self.info_back)
@@ -71,9 +73,11 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.btn_s_quiz_solve.clicked.connect(self.quiz_solve)
         # Q&A 질문 페이지
         self.btn_s_qna_back.clicked.connect(self.qna_back_s)
+        self.btn_s_qna_check.clicked.connect(self.qna_check_s)
         self.btn_s_qna_add.clicked.connect(self.qna_add)
         # 상담 요청 페이지
         self.btn_s_counsel_back.clicked.connect(self.counsel_back_s)
+        self.btn_s_snd.clicked.connect(self.counsel_snd_s)
         self.btn_s_counsel_call.clicked.connect(self.counsel_call)
         # 학습하기 페이지
         self.btn_s_study_back.clicked.connect(self.study_back)
@@ -88,9 +92,11 @@ class Main(QMainWindow, clientui):  # 메인 클래스
     #     else:
     #         pass  # 상담 요청 있음을 알리는 함수 들어갈 자리
 
+    # 디버그
     def debug_logout(self):
         self.stackedWidget.setCurrentIndex(0)
 
+    # 회원 가입 시작
     def join_start(self):  # 회원 가입 - 페이지 초기화 함수
         self.s_skt.send('!join'.encode())  # 서버로 송신
         self.stackedWidget.setCurrentIndex(1)  # 회원 가입 페이지로 전환
@@ -195,7 +201,9 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.radio_login_s.setAutoExclusive(True)
         self.line_login_id.clear()  # 메인 페이지의 라인 초기화
         self.line_login_pw.clear()
+    # 회원 가입 끝
 
+    # 로그인 시작
     def login_start(self):
         if ' ' in self.line_login_id.text() or '?' in self.line_login_id.text()\
                 or '/' in self.line_login_id.text() or '|' in self.line_login_id.text()\
@@ -257,9 +265,9 @@ class Main(QMainWindow, clientui):  # 메인 클래스
 
     def login_btn(self):
         self.btn_login.setEnabled(True)
+    # 로그인 끝
 
-    # 이하 임시 땜빵
-
+    # 문제 출제/풀기 시작
     def quiz_start_t(self):
         self.s_skt.send('!quiz'.encode())
         self.stackedWidget.setCurrentIndex(3)
@@ -342,25 +350,75 @@ class Main(QMainWindow, clientui):  # 메인 클래스
     def quiz_back_s(self):
         self.s_skt.send('!quizend/'.encode())
         self.stackedWidget.setCurrentIndex(7)
+    # 문제 출제/풀기 끝
 
+    # Q&A 시작
     def qna_start_t(self):
         self.stackedWidget.setCurrentIndex(4)
 
     def qna_start_s(self):
         self.stackedWidget.setCurrentIndex(9)
 
+    def qna_check_t(self):
+        self.s_skt.send('!qnacheck'.encode())
+        while True:
+            rcv = self.s_skt.recv(1024)
+            if sys.getsizeof(rcv) > 0:
+                print(f'받은 것 : {rcv.decode()}')
+                break
+        if rcv.decode() == 'none':
+            self.text_t_qna_check.append('등록된 Q&A가 없습니다')
+        # else:
+        #     rcvquiz = rcv.decode().split(' | ')
+        #     for i in range(len(rcvquiz)):
+        #         if i % 2 == 0:
+        #             self.text_t_quiz.append(f'문제 : {rcvquiz[i]}')
+        #         else:
+        #             self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
+
+    def qna_check_s(self):
+        self.s_skt.send('!qnacheck'.encode())
+        while True:
+            rcv = self.s_skt.recv(1024)
+            if sys.getsizeof(rcv) > 0:
+                print(f'받은 것 : {rcv.decode()}')
+                break
+        if rcv.decode() == 'none':
+            self.text_s_qna_check.append('등록된 Q&A가 없습니다')
+        # else:
+        #     rcvquiz = rcv.decode().split(' | ')
+        #     for i in range(len(rcvquiz)):
+        #         if i % 2 == 0:
+        #             self.text_t_quiz.append(f'문제 : {rcvquiz[i]}')
+        #         else:
+        #             self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
+
     def qna_solve(self):
-        pass
+        if ' ' in self.text_t_qna_add.text() or '?' in self.text_t_qna_add.text() \
+                or '/' in self.text_t_qna_add.text() or '|' in self.text_t_qna_add.text():
+            QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
+            self.text_t_qna_add.clear()
+        else:
+            pass
+            # self.s_skt.send(f'!aadd/{self.text_t_qna_add.text()}/{self.text_t_qna_add.text()}'.encode())
 
     def qna_add(self):
-        pass
+        if ' ' in self.text_s_qna_add.text() or '?' in self.text_s_qna_add.text() \
+                or '/' in self.text_s_qna_add.text() or '|' in self.text_s_qna_add.text():
+            QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
+            self.text_s_qna_add.clear()
+        else:
+            pass
+            # self.s_skt.send(f'!aadd/{self.text_s_qna_add.text()}/{self.text_s_qna_add.text()}'.encode())
 
     def qna_back_t(self):
         self.stackedWidget.setCurrentIndex(2)
 
     def qna_back_s(self):
         self.stackedWidget.setCurrentIndex(7)
+    # Q&A 끝
 
+    # 상담 받기/신청 시작
     def counsel_start_t(self):
         self.stackedWidget.setCurrentIndex(5)
 
@@ -373,12 +431,20 @@ class Main(QMainWindow, clientui):  # 메인 클래스
     def counsel_call(self):
         pass
 
+    def counsel_snd_t(self):
+        pass
+
+    def counsel_snd_s(self):
+        pass
+
     def counsel_back_t(self):
         self.stackedWidget.setCurrentIndex(2)
 
     def counsel_back_s(self):
         self.stackedWidget.setCurrentIndex(7)
+    # 상담 받기/신청 끝
 
+    # 통계 보기 시작
     def info_start(self):
         self.stackedWidget.setCurrentIndex(6)
 
@@ -387,7 +453,9 @@ class Main(QMainWindow, clientui):  # 메인 클래스
 
     def info_back(self):
         self.stackedWidget.setCurrentIndex(2)
+    # 통계 보기 끝
 
+    # 학습하기 시작
     def study_start(self):  # 학습하기 페이지 초기 함수
         self.text_study_name.clear()  # 이름란 초기화
         self.text_study_info.clear()  # 정보란 초기화
@@ -429,6 +497,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
 
     def study_back(self):
         self.stackedWidget.setCurrentIndex(7)
+    # 학습하기 끝
 
 
 if __name__ == "__main__":  # 이하 생략

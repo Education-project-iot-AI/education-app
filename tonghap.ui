@@ -42,7 +42,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>8</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -563,19 +563,6 @@ p, li { white-space: pre-wrap; }
        <string>로그아웃</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_21">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>430</y>
-        <width>61</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>↑ 더미</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="btn_t_qna">
       <property name="geometry">
        <rect>
@@ -725,7 +712,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>문제 출제</string>
+       <string>문제 확인</string>
       </property>
      </widget>
     </widget>
@@ -750,7 +737,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>480</x>
-        <y>570</y>
+        <y>630</y>
         <width>89</width>
         <height>25</height>
        </rect>
@@ -776,13 +763,56 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>480</x>
-        <y>630</y>
+        <y>680</y>
         <width>89</width>
         <height>25</height>
        </rect>
       </property>
       <property name="text">
        <string>돌아가기</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_t_qna_check">
+      <property name="geometry">
+       <rect>
+        <x>740</x>
+        <y>200</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Q n A 보기</string>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="text_t_qna_check">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>240</y>
+        <width>611</width>
+        <height>191</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="combo_t_qna">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>200</y>
+        <width>511</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="text_t_qna_add">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>450</y>
+        <width>611</width>
+        <height>161</height>
+       </rect>
       </property>
      </widget>
     </widget>
@@ -806,8 +836,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_t_counsel_ok">
       <property name="geometry">
        <rect>
-        <x>480</x>
-        <y>600</y>
+        <x>830</x>
+        <y>500</y>
         <width>89</width>
         <height>25</height>
        </rect>
@@ -832,14 +862,57 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_t_counsel_back">
       <property name="geometry">
        <rect>
-        <x>480</x>
-        <y>640</y>
+        <x>830</x>
+        <y>550</y>
         <width>89</width>
         <height>25</height>
        </rect>
       </property>
       <property name="text">
        <string>돌아가기</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_t_snd">
+      <property name="geometry">
+       <rect>
+        <x>700</x>
+        <y>550</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>보내기</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="list_t_counsel">
+      <property name="geometry">
+       <rect>
+        <x>820</x>
+        <y>110</y>
+        <width>111</width>
+        <height>371</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="text_t_counsel">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>110</y>
+        <width>681</width>
+        <height>421</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="line_t_snd">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>550</y>
+        <width>581</width>
+        <height>25</height>
+       </rect>
       </property>
      </widget>
     </widget>
@@ -1155,6 +1228,49 @@ p, li { white-space: pre-wrap; }
        <string>돌아가기</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="btn_s_qna_check">
+      <property name="geometry">
+       <rect>
+        <x>750</x>
+        <y>150</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Q n A 보기</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="combo_s_qna">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>150</y>
+        <width>511</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="text_s_qna_check">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>190</y>
+        <width>611</width>
+        <height>191</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="text_s_qna_add">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>400</y>
+        <width>611</width>
+        <height>161</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_12">
      <widget class="QLabel" name="label_39">
@@ -1189,8 +1305,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_s_counsel_call">
       <property name="geometry">
        <rect>
-        <x>490</x>
-        <y>600</y>
+        <x>860</x>
+        <y>530</y>
         <width>89</width>
         <height>25</height>
        </rect>
@@ -1202,14 +1318,57 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_s_counsel_back">
       <property name="geometry">
        <rect>
-        <x>490</x>
-        <y>650</y>
+        <x>860</x>
+        <y>580</y>
         <width>89</width>
         <height>25</height>
        </rect>
       </property>
       <property name="text">
        <string>돌아가기</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="list_s_counsel">
+      <property name="geometry">
+       <rect>
+        <x>850</x>
+        <y>140</y>
+        <width>111</width>
+        <height>371</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="text_s_counsel">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>140</y>
+        <width>681</width>
+        <height>421</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="line_s_snd">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>580</y>
+        <width>581</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_s_snd">
+      <property name="geometry">
+       <rect>
+        <x>730</x>
+        <y>580</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>보내기</string>
       </property>
      </widget>
     </widget>
