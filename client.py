@@ -1,3 +1,12 @@
+# 범례
+# join ~ : 회원 가입 관련
+# login ~ : 로그인 관련
+# quiz ~ : 문제 출제/풀기 관련
+# qna ~ : qna 답변/질문 관련
+# counsel ~ : 상담받기/신청 관련
+# info ~ : 학생 통계 관련
+# study ~ : 학습하기 관련
+
 import sys
 import requests
 import random
@@ -33,13 +42,14 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.line_join_id.textChanged.connect(lambda: self.btn_join_confirm.setDisabled(True))
         # 교사 페이지
         self.btn_t_logout.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))  # 디버그-로그아웃(돌아가기) 연결
-        self.btn_t_quiz.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(3))
+        self.btn_t_quiz.clicked.connect(self.quiz_start_t)
         self.btn_t_qna.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
         self.btn_t_counsel.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(5))
         self.btn_t_info.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(6))
         # 문제 출제 페이지
-        self.btn_t_quiz_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_t_quiz_back.clicked.connect(self.quiz_back_t)
         self.btn_t_quiz_add.clicked.connect(self.quiz_add)
+        self.btn_t_quiz_check.clicked.connect(self.quiz_check)
         # Q&A 답변 페이지
         self.btn_t_qna_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
         self.btn_t_qna_solve.clicked.connect(self.qna_solve)
@@ -51,12 +61,13 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.btn_t_info_show.clicked.connect(self.info_show)
         # 학생 페이지
         self.btn_s_logout.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))  # 디버그-로그아웃(돌아가기) 연결
-        self.btn_s_quiz.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(8))
+        self.btn_s_quiz.clicked.connect(self.quiz_start_s)
         self.btn_s_qna.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(9))
         self.btn_s_counsel.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(10))
-        self.btn_s_study.clicked.connect(self.student_study_start)  # 학습하기 연결
+        self.btn_s_study.clicked.connect(self.study_start)  # 학습하기 연결
         # 문제 풀기 페이지
-        self.btn_s_quiz_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
+        self.btn_s_quiz_back.clicked.connect(self.quiz_back_s)
+        self.btn_s_quiz_list.clicked.connect(self.quiz_list)
         self.btn_s_quiz_solve.clicked.connect(self.quiz_solve)
         # Q&A 질문 페이지
         self.btn_s_qna_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
@@ -66,7 +77,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.btn_s_counsel_call.clicked.connect(self.counsel_call)
         # 학습하기 페이지
         self.btn_s_study_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))  # 돌아가기 연결
-        self.btn_s_study_on.clicked.connect(self.student_study)  # 학습 자료 보기 연결
+        self.btn_s_study_on.clicked.connect(self.study_on)  # 학습 자료 보기 연결
         # 버튼/시그널 연결 끝
         self.btn_login.setDisabled(True)
 
@@ -210,7 +221,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 self.stackedWidget.setCurrentIndex(2)
             else:
                 QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해 주세요')
-        elif self.radio_login_s.isChecked():  # 학생 회원이 체크되어 있을 때
+        else:
             self.s_skt.send(f'!logins/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(16)
@@ -234,38 +245,113 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 self.line_login_pw.clear()
                 self.stackedWidget.setCurrentIndex(7)
                 # self.study_list = rcv  # 수신한 학습 정보를 학습 내역 변수로 이동 (예정)
-        else:
-            QMessageBox.warning(self, '로그인 오류', '회원 종류를 반드시 선택해 주세요')
 
     # 이하 임시 땜빵
 
+    def quiz_start_t(self):
+        self.s_skt.send('!quiz'.encode())
+        self.stackedWidget.setCurrentIndex(3)
+
+    def quiz_start_s(self):
+        self.s_skt.send('!quiz'.encode())
+        self.stackedWidget.setCurrentIndex(8)
+
     def quiz_add(self):
-        pass
+        if ' ' in self.line_quiz_add_q.text() or '?' in self.line_quiz_add_q.text() \
+                or '/' in self.line_quiz_add_q.text() or '|' in self.line_quiz_add_q.text() \
+                or ' ' in self.line_quiz_add_a.text() or '?' in self.line_quiz_add_a.text() \
+                or '/' in self.line_quiz_add_a.text() or '|' in self.line_quiz_add_a.text():
+            QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
+            if ' ' in self.line_quiz_add_q.text() or '?' in self.line_quiz_add_q.text()\
+                    or '/' in self.line_quiz_add_q.text() or '|' in self.line_quiz_add_q.text():
+                self.line_quiz_add_q.clear()
+            if ' ' in self.line_quiz_add_a.text() or '?' in self.line_quiz_add_a.text()\
+                    or '/' in self.line_lline_quiz_add_aogin_pw.text() or '|' in self.line_quiz_add_a.text():
+                self.line_quiz_add_a.clear()
+        else:
+            self.s_skt.send(f'!quizadd/{self.line_quiz_add_q.text()}/{self.line_quiz_add_a.text()}'.encode())
+            QMessageBox.about(self, '문제 등록', '문제가 등록되었습니다')
+            self.line_quiz_add_q.clear()
+            self.line_quiz_add_a.clear()
 
-    def qna_solve(self):
-        pass
+    def quiz_check(self):
+        self.text_t_quiz.clear()
+        self.s_skt.send('!check'.encode())
+        while True:
+            rcv = self.s_skt.recv(1024)
+            if sys.getsizeof(rcv) > 0:
+                print(f'받은 것 : {rcv.decode()}')
+                break
+        if rcv.decode() == 'none':
+            self.text_t_quiz.append('등록된 문제가 없습니다')
+        else:
+            rcvquiz = rcv.decode().split(' | ')
+            for i in range(len(rcvquiz)):
+                if i % 2 == 0:
+                    self.text_t_quiz.append(f'문제 : {rcvquiz[i]}')
+                else:
+                    self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
 
-    def counsel_ok(self):
-        pass
-
-    def info_show(self):
-        pass
+    def quiz_list(self):
+        self.text_s_quiz.clear()
+        self.line_s_quiz_a.clear()
+        self.s_skt.send('!quizlist/'.encode())
+        while True:
+            rcv = self.s_skt.recv(1024)
+            if sys.getsizeof(rcv) > 0:
+                print(f'받은 것 : {rcv.decode()}')
+                break
+        if rcv.decode() == 'none':
+            self.text_s_quiz.append('등록된 문제가 없습니다')
+        else:
+            self.text_t_quiz.append(f'문제 : {rcv.decode()}')
 
     def quiz_solve(self):
+        if ' ' in self.line_s_quiz_a.text() or '?' in self.line_s_quiz_a.text() \
+                or '/' in self.line_s_quiz_a.text() or '|' in self.line_s_quiz_a.text():
+            QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
+            self.line_s_quiz_a.clear()
+        else:
+            self.s_skt.send(f'!quizend/{self.text_s_quiz.text()}/{self.line_s_quiz_a.text()}'.encode())
+            while True:
+                rcv = self.s_skt.recv(16)
+                if sys.getsizeof(rcv) > 0:
+                    print(f'받은 것 : {rcv.decode()}')
+                    break
+            if rcv == '!OK':
+                QMessageBox.about(self, '결과', '정답입니다')
+            else:
+                QMessageBox.warning(self, '결과', '오답입니다')
+
+    def quiz_back_t(self):
+        self.s_skt.send('!quizend/'.encode())
+        self.stackedWidget.setCurrentIndex(2)
+
+    def quiz_back_s(self):
+        self.s_skt.send('!quizend/'.encode())
+        self.stackedWidget.setCurrentIndex(7)
+
+    def qna_solve(self):
         pass
 
     def qna_add(self):
         pass
 
+    def counsel_ok(self):
+        pass
+
     def counsel_call(self):
         pass
 
-    def student_study_start(self):  # 학습하기 페이지 초기 함수
+    def info_show(self):
+        pass
+
+    def study_start(self):  # 학습하기 페이지 초기 함수
         self.text_study_name.clear()  # 이름란 초기화
         self.text_study_info.clear()  # 정보란 초기화
         self.stackedWidget.setCurrentIndex(11)  # 학습하기 페이지로 전환
 
-    def student_study(self):  # 학습하기 함수
+    def study_on(self):  # 학습하기 함수
         birdcodelist = ['A000001149', 'A000001150', 'A000001151', 'A000001152', 'A000001153', 'A000001154',
                         'A000001155', 'A000001156', 'A000001160', 'A000001161', 'A000001162', 'A000001164',
                         'A000001165', 'A000001166', 'A000001167', 'A000001168', 'A000001169', 'A000001170',

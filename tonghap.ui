@@ -42,7 +42,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>10</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -636,8 +636,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_t_quiz_add">
       <property name="geometry">
        <rect>
-        <x>470</x>
-        <y>560</y>
+        <x>480</x>
+        <y>600</y>
         <width>89</width>
         <height>25</height>
        </rect>
@@ -649,8 +649,77 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_t_quiz_back">
       <property name="geometry">
        <rect>
-        <x>470</x>
-        <y>620</y>
+        <x>670</x>
+        <y>690</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>돌아가기</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="line_quiz_add_q">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>460</y>
+        <width>551</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>460</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>문제</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>540</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>정답</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="line_quiz_add_a">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>530</y>
+        <width>551</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="text_t_quiz">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>160</y>
+        <width>691</width>
+        <height>231</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_t_quiz_check">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>410</y>
         <width>89</width>
         <height>25</height>
        </rect>
