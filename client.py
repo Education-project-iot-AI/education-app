@@ -66,11 +66,11 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.line_join_name.clear()
 
     def join_idcheck(self):  # 회원 가입 - 아이디 중복 체크 함수
-        idt = self.line_join_id.text()
-        if not idt:  # ID 란이 비었으면
+        if not self.line_join_id.text():  # ID 란이 비었으면
             QMessageBox.warning(self, 'ID 입력', 'ID를 입력하셔야 합니다')  # 경고 메시지 출력
             self.line_join_id.clear()  # ID 란 초기화
-        elif ' ' in idt or '?' in idt or '/' in idt or '|' in idt:  # 금지어가 포함되어 있으면
+        elif ' ' in self.line_join_id.text() or '?' in self.line_join_id.text()\
+                or '/' in self.line_join_id.text() or '|' in self.line_join_id.text():  # 금지어가 포함되어 있으면
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
             self.line_join_id.clear()
         else:  # ID가 존재하고 금지어도 포함되어 있지 않으면
@@ -88,36 +88,39 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 self.line_join_id.clear()
 
     def join_confirm(self):  # 회원 가입 - 회원 가입 확정 함수
-        idt = self.line_join_id.text()
-        pwt = self.line_join_pw.text()
-        pct = self.line_join_pw_check.text()
-        nmt = self.line_join_name.text()
-        if not idt or not pwt or not nmt:  # 입력란이 비었으면
+        if not self.line_join_id.text() or not self.line_join_pw.text() or not self.line_join_name.text():  # 입력란이 비었으면
             QMessageBox.warning(self, '입력 누락', '모든 정보를 입력해야 합니다')  # 경고 메시지 출력
-        elif ' ' in idt or '?' in idt or '/' in idt or '|' in idt\
-                or ' ' in pwt or '?' in pwt or '/' in pwt or '|' in pwt\
-                or ' ' in nmt or '?' in nmt or '/' in nmt or '|' in nmt:
+        elif ' ' in self.line_join_id.text() or '?' in self.line_join_id.text() or '/' in self.line_join_id.text()\
+                or '|' in self.line_join_id.text() or ' ' in self.line_join_pw.text() or '?' in self.line_join_pw.text()\
+                or '/' in self.line_join_pw.text() or '|' in self.line_join_pw.text() or ' ' in self.line_join_name.text()\
+                or '?' in self.line_join_name.text() or '/' in self.line_join_name.text() or '|' in self.line_join_name.text():
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')  # 경고 메시지 출력
-            if ' ' in idt or '?' in idt or '/' in idt or '|' in idt:
+            if ' ' in self.line_join_id.text() or '?' in self.line_join_id.text()\
+                    or '/' in self.line_join_id.text() or '|' in self.line_join_id.text():
                 self.line_join_id.clear()
-            if ' ' in pwt or '?' in pwt or '/' in pwt or '|' in pwt:
+            if ' ' in self.line_join_pw.text() or '?' in self.line_join_pw.text()\
+                    or '/' in self.line_join_pw.text() or '|' in self.line_join_pw.text():
                 self.line_join_pw.clear()
-            if ' ' in nmt or '?' in nmt or '/' in nmt or '|' in nmt:
+            if ' ' in self.line_join_name.text() or '?' in self.line_join_name.text()\
+                    or '/' in self.line_join_name.text() or '|' in self.line_join_name.text():
                 self.line_join_name.clear()
-        elif pwt != pct:  # 비밀번호와 비밀번호 확인이 일치하지 않으면
+        elif self.line_join_pw.text() != self.line_join_pw_check.text():  # 비밀번호와 비밀번호 확인이 일치하지 않으면
             QMessageBox.warning(self, '비밀번호 불일치', '비밀번호를 다시 한번 확인해 주세요')  # 경고 메시지 출력
-            if ' ' in idt or '?' in idt or '/' in idt or '|' in idt:
+            if ' ' in self.line_join_id.text() or '?' in self.line_join_id.text()\
+                    or '/' in self.line_join_id.text() or '|' in self.line_join_id.text():
                 self.line_join_id.clear()
-            if ' ' in pwt or '?' in pwt or '/' in pwt or '|' in pwt:
+            if ' ' in self.line_join_pw.text() or '?' in self.line_join_pw.text()\
+                    or '/' in self.line_join_pw.text() or '|' in self.line_join_pw.text():
                 self.line_join_pw.clear()
-            if ' ' in nmt or '?' in nmt or '/' in nmt or '|' in nmt:
+            if ' ' in self.line_join_name.text() or '?' in self.line_join_name.text()\
+                    or '/' in self.line_join_name.text() or '|' in self.line_join_name.text():
                 self.line_join_name.clear()
         else:  # 금지어도 없고 비밀번호 확인도 일치하면
             if self.radio_join_t.isChecked():  # 교사 회원이 체크되어 있을 때
-                self.s_skt.send(f'!joindata/{idt}/{pwt}/{nmt}/t'.encode())  # 송신
+                self.s_skt.send(f'!joindata/{self.line_join_id.text()}/{self.line_join_pw.text()}/{self.line_join_name.text()}/t'.encode())  # 송신
                 QMessageBox.about(self, '회원 가입 완료', '회원 가입이 완료되었습니다')  # 완료 메시지 출력
             else:  # 학생 회원이 체크되어 있을 때
-                self.s_skt.send(f'!joindata/{idt}/{pwt}/{nmt}/s'.encode())
+                self.s_skt.send(f'!joindata/{self.line_join_id.text()}/{self.line_join_pw.text()}/{self.line_join_name.text()}/s'.encode())
                 QMessageBox.about(self, '회원 가입 완료', '회원 가입이 완료되었습니다')
             self.btn_join_id_check.setDisabled(True)  # ID 중복 확인 버튼 비활성화
             self.btn_join_confirm.setDisabled(True)  # 회원 가입 버튼 비활성화
@@ -146,17 +149,18 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.line_login_pw.clear()
 
     def login_start(self):
-        lid = self.line_login_id.text()
-        lpw = self.line_login_pw.text()
-        if ' ' in lid or '?' in lid or '/' in lid or '|' in lid\
-                or ' ' in lpw or '?' in lpw or '/' in lpw or '|' in lpw:
+        if ' ' in self.line_login_id.text() or '?' in self.line_login_id.text() or '/' in self.line_login_id.text()\
+                or '|' in self.line_login_id.text() or ' ' in self.line_login_pw.text()\
+                or '?' in self.line_login_pw.text() or '/' in self.line_login_pw.text() or '|' in self.line_login_pw.text():
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')  # 경고 메시지 출력
-            if ' ' in lid or '?' in lid or '/' in lid or '|' in lid:
+            if ' ' in self.line_login_id.text() or '?' in self.line_login_id.text()\
+                    or '/' in self.line_login_id.text() or '|' in self.line_login_id.text():
                 self.line_login_id.clear()
-            if ' ' in lpw or '?' in lpw or '/' in lpw or '|' in lpw:
+            if ' ' in self.line_login_pw.text() or '?' in self.line_login_pw.text()\
+                    or '/' in self.line_login_pw.text() or '|' in self.line_login_pw.text():
                 self.line_login_pw.clear()
         elif self.radio_login_t.isChecked():  # 교사 회원이 체크되어 있을 때
-            self.s_skt.send(f'!logint/{lid}/{lpw}'.encode())  # 송신
+            self.s_skt.send(f'!logint/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())  # 송신
             while True:
                 rcv = self.s_skt.recv(16)
                 if sys.getsizeof(rcv) > 0:
@@ -169,7 +173,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             else:
                 QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해 주세요')
         elif self.radio_login_s.isChecked():  # 학생 회원이 체크되어 있을 때
-            self.s_skt.send(f'!logins/{lid}/{lpw}'.encode())
+            self.s_skt.send(f'!logins/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(16)
                 if sys.getsizeof(rcv) > 0:
