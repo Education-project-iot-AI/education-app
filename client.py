@@ -31,52 +31,52 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         # 메인 페이지
         self.btn_join.clicked.connect(self.join_start)  # 회원 가입 버튼 연결
         self.btn_login.clicked.connect(self.login_start)  # 로그인 버튼 연결
-        self.radio_login_t.pressed.connect(lambda: self.btn_login.setEnabled(True))
-        self.radio_login_s.pressed.connect(lambda: self.btn_login.setEnabled(True))
+        self.radio_login_t.pressed.connect(self.login_btn)
+        self.radio_login_s.pressed.connect(self.login_btn)
         # 회원 가입 페이지
         self.btn_join_backmain.clicked.connect(self.join_back_main)  # 돌아가기 연결
         self.btn_join_id_check.clicked.connect(self.join_idcheck)  # ID 중복 체크 연결
         self.btn_join_confirm.clicked.connect(self.join_confirm)  # 회원 가입 연결
-        self.radio_join_t.pressed.connect(lambda: self.btn_join_id_check.setEnabled(True))
-        self.radio_join_s.pressed.connect(lambda: self.btn_join_id_check.setEnabled(True))
-        self.line_join_id.textChanged.connect(lambda: self.btn_join_confirm.setDisabled(True))
+        self.radio_join_t.pressed.connect(self.join_btn)
+        self.radio_join_s.pressed.connect(self.join_btn)
+        self.line_join_id.textChanged.connect(self.join_btn2)
         # 교사 페이지
-        self.btn_t_logout.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))  # 디버그-로그아웃(돌아가기) 연결
+        self.btn_t_logout.clicked.connect(self.debug_logout)  # 디버그-로그아웃(돌아가기) 연결
         self.btn_t_quiz.clicked.connect(self.quiz_start_t)
-        self.btn_t_qna.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(4))
-        self.btn_t_counsel.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(5))
-        self.btn_t_info.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(6))
+        self.btn_t_qna.clicked.connect(self.qna_start_t)
+        self.btn_t_counsel.clicked.connect(self.counsel_start_t)
+        self.btn_t_info.clicked.connect(self.info_start)
         # 문제 출제 페이지
         self.btn_t_quiz_back.clicked.connect(self.quiz_back_t)
         self.btn_t_quiz_add.clicked.connect(self.quiz_add)
         self.btn_t_quiz_check.clicked.connect(self.quiz_check)
         # Q&A 답변 페이지
-        self.btn_t_qna_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_t_qna_back.clicked.connect(self.qna_back_t)
         self.btn_t_qna_solve.clicked.connect(self.qna_solve)
         # 상담 수락 페이지
-        self.btn_t_counsel_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_t_counsel_back.clicked.connect(self.counsel_back_t)
         self.btn_t_counsel_ok.clicked.connect(self.counsel_ok)
         # 통계보기 페이지
-        self.btn_t_info_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(2))
+        self.btn_t_info_back.clicked.connect(self.info_back)
         self.btn_t_info_show.clicked.connect(self.info_show)
         # 학생 페이지
-        self.btn_s_logout.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))  # 디버그-로그아웃(돌아가기) 연결
+        self.btn_s_logout.clicked.connect(self.debug_logout)  # 디버그-로그아웃(돌아가기) 연결
         self.btn_s_quiz.clicked.connect(self.quiz_start_s)
-        self.btn_s_qna.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(9))
-        self.btn_s_counsel.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(10))
+        self.btn_s_qna.clicked.connect(self.qna_start_s)
+        self.btn_s_counsel.clicked.connect(self.counsel_start_s)
         self.btn_s_study.clicked.connect(self.study_start)  # 학습하기 연결
         # 문제 풀기 페이지
         self.btn_s_quiz_back.clicked.connect(self.quiz_back_s)
         self.btn_s_quiz_list.clicked.connect(self.quiz_list)
         self.btn_s_quiz_solve.clicked.connect(self.quiz_solve)
         # Q&A 질문 페이지
-        self.btn_s_qna_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
+        self.btn_s_qna_back.clicked.connect(self.qna_back_s)
         self.btn_s_qna_add.clicked.connect(self.qna_add)
         # 상담 요청 페이지
-        self.btn_s_counsel_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))
+        self.btn_s_counsel_back.clicked.connect(self.counsel_back_s)
         self.btn_s_counsel_call.clicked.connect(self.counsel_call)
         # 학습하기 페이지
-        self.btn_s_study_back.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(7))  # 돌아가기 연결
+        self.btn_s_study_back.clicked.connect(self.study_back)
         self.btn_s_study_on.clicked.connect(self.study_on)  # 학습 자료 보기 연결
         # 버튼/시그널 연결 끝
         self.btn_login.setDisabled(True)
@@ -87,6 +87,9 @@ class Main(QMainWindow, clientui):  # 메인 클래스
     #         pass
     #     else:
     #         pass  # 상담 요청 있음을 알리는 함수 들어갈 자리
+
+    def debug_logout(self):
+        self.stackedWidget.setCurrentIndex(0)
 
     def join_start(self):  # 회원 가입 - 페이지 초기화 함수
         self.s_skt.send('!join'.encode())  # 서버로 송신
@@ -174,6 +177,12 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             self.line_join_pw_check.clear()
             self.line_join_name.clear()
 
+    def join_btn(self):
+        self.btn_join_id_check.setEnabled(True)
+
+    def join_btn2(self):
+        self.btn_join_confirm.setDisabled(True)
+
     def join_back_main(self):
         self.s_skt.send('!Q_join'.encode())  # 회원 가입 창을 나갈 때 !Q_join 전송할 것
         self.stackedWidget.setCurrentIndex(0)
@@ -245,6 +254,9 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 self.line_login_pw.clear()
                 self.stackedWidget.setCurrentIndex(7)
                 # self.study_list = rcv  # 수신한 학습 정보를 학습 내역 변수로 이동 (예정)
+
+    def login_btn(self):
+        self.btn_login.setEnabled(True)
 
     # 이하 임시 땜빵
 
@@ -331,11 +343,29 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.s_skt.send('!quizend/'.encode())
         self.stackedWidget.setCurrentIndex(7)
 
+    def qna_start_t(self):
+        self.stackedWidget.setCurrentIndex(4)
+
+    def qna_start_s(self):
+        self.stackedWidget.setCurrentIndex(9)
+
     def qna_solve(self):
         pass
 
     def qna_add(self):
         pass
+
+    def qna_back_t(self):
+        self.stackedWidget.setCurrentIndex(2)
+
+    def qna_back_s(self):
+        self.stackedWidget.setCurrentIndex(7)
+
+    def counsel_start_t(self):
+        self.stackedWidget.setCurrentIndex(5)
+
+    def counsel_start_s(self):
+        self.stackedWidget.setCurrentIndex(10)
 
     def counsel_ok(self):
         pass
@@ -343,8 +373,20 @@ class Main(QMainWindow, clientui):  # 메인 클래스
     def counsel_call(self):
         pass
 
+    def counsel_back_t(self):
+        self.stackedWidget.setCurrentIndex(2)
+
+    def counsel_back_s(self):
+        self.stackedWidget.setCurrentIndex(7)
+
+    def info_start(self):
+        self.stackedWidget.setCurrentIndex(6)
+
     def info_show(self):
         pass
+
+    def info_back(self):
+        self.stackedWidget.setCurrentIndex(2)
 
     def study_start(self):  # 학습하기 페이지 초기 함수
         self.text_study_name.clear()  # 이름란 초기화
@@ -384,6 +426,9 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.text_study_info.clear()  # 정보란 초기화
         self.text_study_name.append(bird_data[1][0][6].text)  # 이름란 이름 표시
         self.text_study_info.append(bird_data[1][0][16].text)  # 정보란 정보 표시
+
+    def study_back(self):
+        self.stackedWidget.setCurrentIndex(7)
 
 
 if __name__ == "__main__":  # 이하 생략

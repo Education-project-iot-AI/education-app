@@ -42,7 +42,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>8</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -1042,8 +1042,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_s_quiz_solve">
       <property name="geometry">
        <rect>
-        <x>500</x>
-        <y>600</y>
+        <x>700</x>
+        <y>450</y>
         <width>89</width>
         <height>25</height>
        </rect>
@@ -1063,6 +1063,39 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="text">
        <string>돌아가기</string>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="text_s_quiz_q">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>160</y>
+        <width>641</width>
+        <height>251</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="line_s_quiz_a">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>450</y>
+        <width>261</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_s_quiz_list">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>450</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>문제 받기</string>
       </property>
      </widget>
     </widget>
