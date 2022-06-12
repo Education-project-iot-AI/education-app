@@ -1115,8 +1115,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_s_quiz_solve">
       <property name="geometry">
        <rect>
-        <x>700</x>
-        <y>450</y>
+        <x>430</x>
+        <y>520</y>
         <width>89</width>
         <height>25</height>
        </rect>
@@ -1141,18 +1141,18 @@ p, li { white-space: pre-wrap; }
      <widget class="QTextBrowser" name="text_s_quiz">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>160</y>
-        <width>641</width>
-        <height>251</height>
+        <x>60</x>
+        <y>150</y>
+        <width>461</width>
+        <height>351</height>
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="line_s_quiz_a">
+     <widget class="QLineEdit" name="line_quiz_solve">
       <property name="geometry">
        <rect>
-        <x>410</x>
-        <y>450</y>
+        <x>160</x>
+        <y>520</y>
         <width>261</width>
         <height>25</height>
        </rect>
@@ -1161,14 +1161,24 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_s_quiz_list">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>450</y>
+        <x>60</x>
+        <y>520</y>
         <width>89</width>
         <height>25</height>
        </rect>
       </property>
       <property name="text">
        <string>문제 받기</string>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="text_s_quized">
+      <property name="geometry">
+       <rect>
+        <x>540</x>
+        <y>150</y>
+        <width>461</width>
+        <height>491</height>
+       </rect>
       </property>
      </widget>
     </widget>

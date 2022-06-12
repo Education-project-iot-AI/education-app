@@ -271,10 +271,16 @@ class Main(QMainWindow, clientui):  # 메인 클래스
     def quiz_start_t(self):
         self.s_skt.send('!quiz'.encode())
         self.stackedWidget.setCurrentIndex(3)
+        self.text_t_quiz.clear()
+        self.line_quiz_add_q.clear()
+        self.line_quiz_add_a.clear()
 
     def quiz_start_s(self):
         self.s_skt.send('!quiz'.encode())
         self.stackedWidget.setCurrentIndex(8)
+        self.text_s_quiz.clear()
+        self.text_s_quized.clear()
+        self.line_quiz_solve.clear()
 
     def quiz_add(self):
         if ' ' in self.line_quiz_add_q.text() or '?' in self.line_quiz_add_q.text() \
@@ -313,7 +319,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                     self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
 
     def quiz_list(self):
-        self.line_s_quiz_a.clear()
+        self.line_quiz_solve.clear()
         self.s_skt.send('!quizlist/'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
@@ -326,12 +332,12 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             self.text_s_quiz.setPlainText(f'{rcv.decode()}')
 
     def quiz_solve(self):
-        if ' ' in self.line_s_quiz_a.text() or '?' in self.line_s_quiz_a.text() \
-                or '/' in self.line_s_quiz_a.text() or '|' in self.line_s_quiz_a.text():
+        if ' ' in self.line_quiz_solve.text() or '?' in self.line_quiz_solve.text() \
+                or '/' in self.line_quiz_solve.text() or '|' in self.line_quiz_solve.text():
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
-            self.line_s_quiz_a.clear()
+            self.line_quiz_solve.clear()
         else:
-            self.s_skt.send(f'!quizstart/{self.text_s_quiz.toPlainText()}/{self.line_s_quiz_a.text()}'.encode())
+            self.s_skt.send(f'!quizstart/{self.text_s_quiz.toPlainText()}/{self.line_quiz_solve.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(32)
                 if sys.getsizeof(rcv) > 0:
@@ -339,8 +345,15 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                     break
             if rcv.decode() == '!OK':
                 QMessageBox.about(self, '결과', '정답입니다')
+                self.text_s_quized.append(f'문제 : {self.text_s_quiz.toPlainText()}')
+                self.text_s_quized.append(f'정답 : {self.line_quiz_solve.text()}')
+                self.text_s_quiz.clear()
+                self.line_quiz_solve.clear()
             else:
                 QMessageBox.warning(self, '결과', '오답입니다')
+                self.text_s_quized.append(f'문제 : {self.text_s_quiz.toPlainText()}')
+                self.text_s_quized.append(f'오답 : {self.line_quiz_solve.text()}')
+                self.line_quiz_solve.clear()
 
     def quiz_back_t(self):
         self.s_skt.send('!quizend/'.encode())
