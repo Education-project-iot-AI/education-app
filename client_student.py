@@ -100,7 +100,7 @@ print(array_edu)
 
 
 
-########서버에 학습내용 보내기######(수정 요망!!!!!1)
+########서버에 학습내용 보내기######
 port = 13308
 address = ("localhost",port)
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
