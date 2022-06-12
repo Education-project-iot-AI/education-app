@@ -1,5 +1,6 @@
 # threading TCP CHAT server
 
+import random
 from socket import *
 from threading import *
 
@@ -56,6 +57,21 @@ class ChatServer:
                         self.snd_client('!NO')
                     else:
                         self.snd_client('!OK')
+                elif cmd[0] == '!check':
+                    if random.randint(1, 2) == 1:
+                        self.snd_client('!none')
+                    else:
+                        self.snd_client('이것은 문제1 | 이것은 답1 | 이것은 문제2 | 이것은 답2')
+                elif cmd[0] == '!quizlist':
+                    if random.randint(1, 2) == 1:
+                        self.snd_client('!none')
+                    else:
+                        self.snd_client('이것은 문제1')
+                elif cmd[0] == '!quizstart':
+                    if random.randint(1, 2) == 1:
+                        self.snd_client('!OK')
+                    else:
+                        self.snd_client('!NO')
             else:
                 pass
         c_skt.close()
@@ -63,7 +79,7 @@ class ChatServer:
     def snd_client(self, snd_msg):
         skt, (ip, port) = self.client[0]
         print(f'보내야 하는 것 : {snd_msg}')
-        skt.send(snd_msg.encode())
+        skt.sendall(snd_msg.encode())
         print(f'보낸 것 : {snd_msg}')
 
 

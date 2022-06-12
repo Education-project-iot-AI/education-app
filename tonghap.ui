@@ -42,7 +42,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>8</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -1138,7 +1138,7 @@ p, li { white-space: pre-wrap; }
        <string>돌아가기</string>
       </property>
      </widget>
-     <widget class="QTextBrowser" name="text_s_quiz_q">
+     <widget class="QTextBrowser" name="text_s_quiz">
       <property name="geometry">
        <rect>
         <x>220</x>

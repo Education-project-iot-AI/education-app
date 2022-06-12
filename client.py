@@ -302,7 +302,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == 'none':
+        if rcv.decode() == '!none':
             self.text_t_quiz.append('등록된 문제가 없습니다')
         else:
             rcvquiz = rcv.decode().split(' | ')
@@ -313,7 +313,6 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                     self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
 
     def quiz_list(self):
-        self.text_s_quiz.clear()
         self.line_s_quiz_a.clear()
         self.s_skt.send('!quizlist/'.encode())
         while True:
@@ -321,10 +320,10 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == 'none':
-            self.text_s_quiz.append('등록된 문제가 없습니다')
+        if rcv.decode() == '!none':
+            self.text_s_quiz.setPlainText('등록된 문제가 없습니다')
         else:
-            self.text_t_quiz.append(f'문제 : {rcv.decode()}')
+            self.text_s_quiz.setPlainText(f'{rcv.decode()}')
 
     def quiz_solve(self):
         if ' ' in self.line_s_quiz_a.text() or '?' in self.line_s_quiz_a.text() \
@@ -332,13 +331,13 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
             self.line_s_quiz_a.clear()
         else:
-            self.s_skt.send(f'!quizend/{self.text_s_quiz.text()}/{self.line_s_quiz_a.text()}'.encode())
+            self.s_skt.send(f'!quizstart/{self.text_s_quiz.toPlainText()}/{self.line_s_quiz_a.text()}'.encode())
             while True:
-                rcv = self.s_skt.recv(16)
+                rcv = self.s_skt.recv(32)
                 if sys.getsizeof(rcv) > 0:
                     print(f'받은 것 : {rcv.decode()}')
                     break
-            if rcv == '!OK':
+            if rcv.decode() == '!OK':
                 QMessageBox.about(self, '결과', '정답입니다')
             else:
                 QMessageBox.warning(self, '결과', '오답입니다')
@@ -366,7 +365,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == 'none':
+        if rcv.decode() == '!none':
             self.text_t_qna_check.append('등록된 Q&A가 없습니다')
         # else:
         #     rcvquiz = rcv.decode().split(' | ')
@@ -383,7 +382,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == 'none':
+        if rcv.decode() == '!none':
             self.text_s_qna_check.append('등록된 Q&A가 없습니다')
         # else:
         #     rcvquiz = rcv.decode().split(' | ')
@@ -394,8 +393,8 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         #             self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
 
     def qna_solve(self):
-        if ' ' in self.text_t_qna_add.text() or '?' in self.text_t_qna_add.text() \
-                or '/' in self.text_t_qna_add.text() or '|' in self.text_t_qna_add.text():
+        if ' ' in self.text_t_qna_add.toPlainText() or '?' in self.text_t_qna_add.toPlainText() \
+                or '/' in self.text_t_qna_add.toPlainText() or '|' in self.text_t_qna_add.toPlainText():
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
             self.text_t_qna_add.clear()
         else:
@@ -403,13 +402,13 @@ class Main(QMainWindow, clientui):  # 메인 클래스
             # self.s_skt.send(f'!aadd/{self.text_t_qna_add.text()}/{self.text_t_qna_add.text()}'.encode())
 
     def qna_add(self):
-        if ' ' in self.text_s_qna_add.text() or '?' in self.text_s_qna_add.text() \
-                or '/' in self.text_s_qna_add.text() or '|' in self.text_s_qna_add.text():
+        if ' ' in self.text_s_qna_add.toPlainText() or '?' in self.text_s_qna_add.toPlainText() \
+                or '/' in self.text_s_qna_add.toPlainText() or '|' in self.text_s_qna_add.toPlainText():
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
             self.text_s_qna_add.clear()
         else:
             pass
-            # self.s_skt.send(f'!aadd/{self.text_s_qna_add.text()}/{self.text_s_qna_add.text()}'.encode())
+            # self.s_skt.send(f'!aadd/{self.text_s_qna_add.toPlainText()}/{self.text_s_qna_add.toPlainText()}'.encode())
 
     def qna_back_t(self):
         self.stackedWidget.setCurrentIndex(2)
@@ -490,10 +489,8 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         code = random.choice(birdcodelist)  # 학습 & 출제 대상 코드 리스트에서 랜덤 추출
         params = {'serviceKey': '9cCN4TXQK/nLX/tkVrz9+4qnPHIyI5sjjCpkfO9kPAH8y6fDcWtxwsp7JM0bozPvZklvvCVKqnZOig81BIMjmw==', 'q1': code}  # 패러미터에 입력
         bird_data = fromstring(requests.get('http://apis.data.go.kr/1400119/BirdService/birdIlstrInfo', params=params).content.decode())  # 조류 정보 API에서 획득
-        self.text_study_name.clear()  # 이름란 초기화
-        self.text_study_info.clear()  # 정보란 초기화
-        self.text_study_name.append(bird_data[1][0][6].text)  # 이름란 이름 표시
-        self.text_study_info.append(bird_data[1][0][16].text)  # 정보란 정보 표시
+        self.text_study_name.setPlainText(bird_data[1][0][6].text)  # 이름란 이름 표시
+        self.text_study_info.setPlainText(bird_data[1][0][16].text)  # 정보란 정보 표시
 
     def study_back(self):
         self.stackedWidget.setCurrentIndex(7)
