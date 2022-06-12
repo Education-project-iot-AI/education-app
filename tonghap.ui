@@ -42,7 +42,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>8</number>
+     <number>9</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -68,7 +68,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>대충 타이틀 (메인 화면)</string>
+       <string>(메인 화면)</string>
       </property>
       <property name="textFormat">
        <enum>Qt::PlainText</enum>
@@ -252,7 +252,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>회원 가입 창 (반 더미)</string>
+       <string>(회원 가입)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -505,7 +505,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>교사 페이지 (반 더미)</string>
+       <string>(교사 페이지)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -614,7 +614,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>교사 페이지 (문제 출제 더미)</string>
+       <string>(문제 출제)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -727,7 +727,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>교사 페이지 (Q&amp;A 더미)</string>
+       <string>(Q&amp;A 답변하기)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -782,7 +782,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>Q n A 보기</string>
+       <string>QnA 새로고침</string>
       </property>
      </widget>
      <widget class="QTextBrowser" name="text_t_qna_check">
@@ -814,6 +814,9 @@ p, li { white-space: pre-wrap; }
         <height>161</height>
        </rect>
       </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_9">
@@ -827,7 +830,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>교사 페이지 (상담받기 더미)</string>
+       <string>(상담받기)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -940,7 +943,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>교사 페이지 (학생 통계 더미)</string>
+       <string>(학생 통계)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -972,6 +975,23 @@ p, li { white-space: pre-wrap; }
        <string>돌아가기</string>
       </property>
      </widget>
+     <widget class="QTextBrowser" name="textBrowser">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>110</y>
+        <width>971</width>
+        <height>471</height>
+       </rect>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;통계 UI (그래프 같은 것?) 들어갈 자리&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_4">
      <widget class="QLabel" name="label_17">
@@ -997,7 +1017,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>학생 페이지 (반 더미)</string>
+       <string>(학생 페이지)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -1106,7 +1126,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>학생 페이지 (문제 풀기)</string>
+       <string>(문제 풀기)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -1206,7 +1226,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>학생 페이지 (Q&amp;A 묻기)</string>
+       <string>(Q&amp;A 질문하기)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -1248,7 +1268,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>Q n A 보기</string>
+       <string>QnA 새로고침</string>
       </property>
      </widget>
      <widget class="QComboBox" name="combo_s_qna">
@@ -1306,7 +1326,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>학생 페이지 (상담 하기)</string>
+       <string>(상담 신청)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -1419,7 +1439,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>학습하기 페이지(더미)</string>
+       <string>(학습하기)</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -1428,8 +1448,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btn_s_study_on">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>290</y>
+        <x>670</x>
+        <y>170</y>
         <width>89</width>
         <height>25</height>
        </rect>
@@ -1443,7 +1463,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>280</x>
         <y>160</y>
-        <width>191</width>
+        <width>261</width>
         <height>41</height>
        </rect>
       </property>
@@ -1461,8 +1481,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_27">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>180</y>
+        <x>210</x>
+        <y>170</y>
         <width>67</width>
         <height>17</height>
        </rect>
@@ -1474,7 +1494,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_28">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>210</x>
         <y>220</y>
         <width>67</width>
         <height>17</height>

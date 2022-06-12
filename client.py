@@ -54,6 +54,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.btn_t_qna_back.clicked.connect(self.qna_back_t)
         self.btn_t_qna_check.clicked.connect(self.qna_check_t)
         self.btn_t_qna_solve.clicked.connect(self.qna_solve)
+        self.combo_t_qna.currentIndexChanged.connect(self.qna_view_t)
         # 상담 수락 페이지
         self.btn_t_counsel_back.clicked.connect(self.counsel_back_t)
         self.btn_t_snd.clicked.connect(self.counsel_snd_t)
@@ -75,6 +76,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
         self.btn_s_qna_back.clicked.connect(self.qna_back_s)
         self.btn_s_qna_check.clicked.connect(self.qna_check_s)
         self.btn_s_qna_add.clicked.connect(self.qna_add)
+        self.combo_s_qna.currentIndexChanged.connect(self.qna_view_s)
         # 상담 요청 페이지
         self.btn_s_counsel_back.clicked.connect(self.counsel_back_s)
         self.btn_s_snd.clicked.connect(self.counsel_snd_s)
@@ -309,7 +311,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '!none':
-            self.text_t_quiz.append('등록된 문제가 없습니다')
+            QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
         else:
             rcvquiz = rcv.decode().split(' | ')
             for i in range(len(rcvquiz)):
@@ -327,7 +329,7 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '!none':
-            self.text_s_quiz.setPlainText('등록된 문제가 없습니다')
+            QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
         else:
             self.text_s_quiz.setPlainText(f'{rcv.decode()}')
 
@@ -367,11 +369,23 @@ class Main(QMainWindow, clientui):  # 메인 클래스
     # Q&A 시작
     def qna_start_t(self):
         self.stackedWidget.setCurrentIndex(4)
+        self.combo_t_qna.clear()
+        self.text_t_qna_check.clear()
+        self.text_t_qna_add.clear()
+        self.combo_t_qna.addItem('Q&A 질문|답변 목록')
+        self.text_t_qna_add.setReadOnly(True)
+        self.btn_t_qna_solve.setEnabled(False)
 
     def qna_start_s(self):
         self.stackedWidget.setCurrentIndex(9)
+        self.combo_s_qna.clear()
+        self.text_s_qna_check.clear()
+        self.text_s_qna_add.clear()
+        self.combo_s_qna.addItem('Q&A 질문|답변 목록')
 
     def qna_check_t(self):
+        self.combo_t_qna.clear()
+        self.combo_t_qna.addItem('Q&A 질문|답변 목록')
         self.s_skt.send('!qnacheck'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
@@ -379,16 +393,18 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '!none':
-            self.text_t_qna_check.append('등록된 Q&A가 없습니다')
-        # else:
-        #     rcvquiz = rcv.decode().split(' | ')
-        #     for i in range(len(rcvquiz)):
-        #         if i % 2 == 0:
-        #             self.text_t_quiz.append(f'문제 : {rcvquiz[i]}')
-        #         else:
-        #             self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
+            QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
+        else:
+            rcvqna = rcv.decode().split(' | ')
+            for i in range(0, len(rcvqna), 2):
+                if rcvqna[i + 1] != '^none':
+                    self.combo_t_qna.addItem(f'<해결됨> {rcvqna[i]} | {rcvqna[i + 1]}')
+                else:
+                    self.combo_t_qna.addItem(f'<미해결> {rcvqna[i]} | 답변 없음')
 
     def qna_check_s(self):
+        self.combo_s_qna.clear()
+        self.combo_s_qna.addItem('Q&A 질문|답변 목록')
         self.s_skt.send('!qnacheck'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
@@ -396,32 +412,69 @@ class Main(QMainWindow, clientui):  # 메인 클래스
                 print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '!none':
-            self.text_s_qna_check.append('등록된 Q&A가 없습니다')
-        # else:
-        #     rcvquiz = rcv.decode().split(' | ')
-        #     for i in range(len(rcvquiz)):
-        #         if i % 2 == 0:
-        #             self.text_t_quiz.append(f'문제 : {rcvquiz[i]}')
-        #         else:
-        #             self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
+            QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
+        else:
+            rcvqna = rcv.decode().split(' | ')
+            for i in range(0, len(rcvqna), 2):
+                if rcvqna[i + 1] != '^none':
+                    self.combo_s_qna.addItem(f'<해결됨> {rcvqna[i]} | {rcvqna[i + 1]}')
+                else:
+                    self.combo_s_qna.addItem(f'<미해결> {rcvqna[i]} | 답변 없음')
+
+    def qna_view_t(self):
+        if self.combo_t_qna.currentText()[:5] == '<해결됨>':
+            self.text_t_qna_check.clear()
+            qvt = self.combo_t_qna.currentText().split(' | ')
+            self.text_t_qna_check.append(f'질문 / {qvt[0].replace("<해결됨> ", "")}')
+            self.text_t_qna_check.append(f'답변 / {qvt[1]}')
+            self.text_t_qna_add.clear()
+            self.text_t_qna_add.append('이미 답변이 등록된 질문입니다')
+            self.text_t_qna_add.setReadOnly(True)
+            self.btn_t_qna_solve.setDisabled(True)
+        elif self.combo_t_qna.currentText()[:5] == '<미해결>':
+            self.text_t_qna_check.clear()
+            qvt = self.combo_t_qna.currentText().split(' | ')
+            self.text_t_qna_check.append(f'질문 / {qvt[0].replace("<미해결> ", "")}')
+            self.text_t_qna_add.clear()
+            self.text_t_qna_add.setReadOnly(False)
+            self.btn_t_qna_solve.setEnabled(True)
+
+    def qna_view_s(self):
+        if self.combo_s_qna.currentText()[:5] == '<해결됨>':
+            self.text_s_qna_check.clear()
+            qvt = self.combo_s_qna.currentText().split(' | ')
+            self.text_s_qna_check.append(f'질문 / {qvt[0].replace("<해결됨> ", "")}')
+            self.text_s_qna_check.append(f'답변 / {qvt[1]}')
+        elif self.combo_s_qna.currentText()[:5] == '<미해결>':
+            self.text_s_qna_check.clear()
+            qvt = self.combo_s_qna.currentText().split(' | ')
+            self.text_s_qna_check.append(f'질문 / {qvt[0].replace("<미해결> ", "")}')
 
     def qna_solve(self):
-        if ' ' in self.text_t_qna_add.toPlainText() or '?' in self.text_t_qna_add.toPlainText() \
+        if not self.text_t_qna_add.toPlainText():
+            QMessageBox.warning(self, '입력 누락', '답변을 입력해야 합니다')
+        elif ' ' in self.text_t_qna_add.toPlainText() or '?' in self.text_t_qna_add.toPlainText() \
                 or '/' in self.text_t_qna_add.toPlainText() or '|' in self.text_t_qna_add.toPlainText():
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
-            self.text_t_qna_add.clear()
         else:
-            pass
-            # self.s_skt.send(f'!aadd/{self.text_t_qna_add.text()}/{self.text_t_qna_add.text()}'.encode())
+            self.s_skt.send(f'!aadd/{self.text_t_qna_check.toPlainText().replace("질문 / ", "")}/{self.text_t_qna_add.toPlainText()}'.encode())
+            qsi = self.combo_t_qna.currentIndex()
+            qst = self.combo_t_qna.currentText().split(' | ')
+            qsa = self.text_t_qna_add.toPlainText()
+            self.combo_t_qna.removeItem(qsi)
+            self.combo_t_qna.insertItem(qsi, f'<해결됨> {qst[0].replace("<미해결> ", "")} | {qsa}')
+            self.combo_t_qna.setCurrentIndex(qsi)
+        self.text_t_qna_add.clear()
 
     def qna_add(self):
-        if ' ' in self.text_s_qna_add.toPlainText() or '?' in self.text_s_qna_add.toPlainText() \
+        if not self.text_s_qna_add.toPlainText():
+            QMessageBox.warning(self, '입력 누락', '질문을 입력해야 합니다')
+        elif ' ' in self.text_s_qna_add.toPlainText() or '?' in self.text_s_qna_add.toPlainText() \
                 or '/' in self.text_s_qna_add.toPlainText() or '|' in self.text_s_qna_add.toPlainText():
             QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
-            self.text_s_qna_add.clear()
         else:
-            pass
-            # self.s_skt.send(f'!aadd/{self.text_s_qna_add.toPlainText()}/{self.text_s_qna_add.toPlainText()}'.encode())
+            self.s_skt.send(f'!qadd/{self.text_s_qna_add.toPlainText()}/^none'.encode())
+        self.text_s_qna_add.clear()
 
     def qna_back_t(self):
         self.stackedWidget.setCurrentIndex(2)

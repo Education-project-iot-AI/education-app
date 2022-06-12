@@ -29,15 +29,11 @@ class ChatServer:
 
     def rcv_msg(self, c_skt):
         while True:
-            # try:
             inc_msg = c_skt.recv(256)
             if not inc_msg:
                 print('연결 종료')
                 self.client.clear()
                 break
-            # except:
-            #     continue
-            # else:
             self.last_rcv_msg = inc_msg.decode()
             print(f'받은 것 : {self.last_rcv_msg}')
             if self.last_rcv_msg[0] == '!':
@@ -72,6 +68,11 @@ class ChatServer:
                         self.snd_client('!OK')
                     else:
                         self.snd_client('!NO')
+                elif cmd[0] == '!qnacheck':
+                    if random.randint(1, 2) == 1:
+                        self.snd_client('!none')
+                    else:
+                        self.snd_client('질문1 | 답변1 | 질문2 | ^none | 질문3 | 답변3 | 질문4 | ^none')
             else:
                 pass
         c_skt.close()
@@ -80,7 +81,7 @@ class ChatServer:
         skt, (ip, port) = self.client[0]
         print(f'보내야 하는 것 : {snd_msg}')
         skt.sendall(snd_msg.encode())
-        print(f'보낸 것 : {snd_msg}')
+        print(f'보낸 것 : {snd_msg} / 보낸 곳 : {ip}, {port}')
 
 
 if __name__ == '__main__':
