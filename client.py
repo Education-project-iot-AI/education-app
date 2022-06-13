@@ -8,14 +8,14 @@
 # study ~ : 학습하기 관련
 
 import sys
-import requests
-import random
+# import requests
+# import random
 from socket import *
 from PyQt5 import uic, QtCore
 # from PyQt5.QtGui import *  # 이하 모듈 계속 안 쓰면 삭제 예정
 # from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from xml.etree.ElementTree import fromstring
+# from xml.etree.ElementTree import fromstring
 
 
 clientui = uic.loadUiType("tonghap.ui")[0]
@@ -87,13 +87,6 @@ class Main(QMainWindow, clientui):
         # 버튼/시그널 연결 끝
         self.btn_login.setDisabled(True)
 
-    # def rcv_pageswap(self):  # 페이지 전환할 때 마다 0, 1 신호를 받아서 상담 신청 있는지 체크함 (상담 요청 수신 신호는 생략)
-    #     rcv = self.s_skt.recv(1024)
-    #     if rcv == '0':
-    #         pass
-    #     else:
-    #         pass  # 상담 요청 있음을 알리는 함수 들어갈 자리
-
     # 디버그 시작
     def debug_logout(self):
         self.stackedWidget.setCurrentIndex(0)
@@ -140,14 +133,12 @@ class Main(QMainWindow, clientui):
     def join_confirm(self):  # 회원 가입 확정 함수
         if not self.line_join_id.text() or not self.line_join_pw.text() or not self.line_join_name.text():
             QMessageBox.warning(self, '입력 누락', '모든 정보를 입력해야 합니다')
-        elif ' ' in self.line_join_id.text()\
-                or '/' in self.line_join_id.text() or '|' in self.line_join_id.text()\
-                or '^' in self.line_join_id.text() or ' ' in self.line_join_pw.text()\
-                or '/' in self.line_join_pw.text()\
+        elif ' ' in self.line_join_id.text() or '/' in self.line_join_id.text()\
+                or '|' in self.line_join_id.text() or '^' in self.line_join_id.text()\
+                or ' ' in self.line_join_pw.text() or '/' in self.line_join_pw.text()\
                 or '|' in self.line_join_pw.text() or '^' in self.line_join_pw.text()\
-                or ' ' in self.line_join_name.text()\
-                or '/' in self.line_join_name.text() or '|' in self.line_join_name.text()\
-                or '^' in self.line_join_name.text():
+                or ' ' in self.line_join_name.text() or '/' in self.line_join_name.text()\
+                or '|' in self.line_join_name.text() or '^' in self.line_join_name.text():
             QMessageBox.warning(self, '금지어 포함', '공백, /, |, ^는 사용할 수 없습니다')
             if ' ' in self.line_join_id.text() or '/' in self.line_join_id.text()\
                     or '|' in self.line_join_id.text() or '^' in self.line_join_id.text():
@@ -155,20 +146,17 @@ class Main(QMainWindow, clientui):
             if ' ' in self.line_join_pw.text() or '/' in self.line_join_pw.text()\
                     or '|' in self.line_join_pw.text() or '^' in self.line_join_pw.text():
                 self.line_join_pw.clear()
-            if ' ' in self.line_join_name.text()\
-                    or '/' in self.line_join_name.text() or '|' in self.line_join_name.text()\
-                    or '^' in self.line_join_name.text():
+            if ' ' in self.line_join_name.text() or '/' in self.line_join_name.text()\
+                    or '|' in self.line_join_name.text() or '^' in self.line_join_name.text():
                 self.line_join_name.clear()
         elif self.line_join_pw.text() != self.line_join_pw_check.text():
             QMessageBox.warning(self, '비밀번호 불일치', '비밀번호를 다시 한번 확인해 주세요')
-            if ' ' in self.line_join_id.text()\
-                    or '/' in self.line_join_id.text() or '|' in self.line_join_id.text():
+            if ' ' in self.line_join_id.text() or '/' in self.line_join_id.text() or '|' in self.line_join_id.text():
                 self.line_join_id.clear()
-            if ' ' in self.line_join_pw.text()\
-                    or '/' in self.line_join_pw.text() or '|' in self.line_join_pw.text():
+            if ' ' in self.line_join_pw.text() or '/' in self.line_join_pw.text() or '|' in self.line_join_pw.text():
                 self.line_join_pw.clear()
-            if ' ' in self.line_join_name.text()\
-                    or '/' in self.line_join_name.text() or '|' in self.line_join_name.text():
+            if ' ' in self.line_join_name.text() or '/' in self.line_join_name.text()\
+                    or '|' in self.line_join_name.text():
                 self.line_join_name.clear()
         else:
             if self.radio_join_t.isChecked():
@@ -216,10 +204,9 @@ class Main(QMainWindow, clientui):
     def login_start(self):  # 로그인 시작 함수
         if not self.line_login_id.text() or not self.line_login_pw.text():
             QMessageBox.warning(self, '입력 누락', 'ID와 PW를 모두 입력해야 합니다')
-        elif ' ' in self.line_login_id.text()\
-                or '/' in self.line_login_id.text() or '|' in self.line_login_id.text()\
-                or '^' in self.line_login_id.text() or ' ' in self.line_login_pw.text()\
-                or '/' in self.line_login_pw.text()\
+        elif ' ' in self.line_login_id.text() or '/' in self.line_login_id.text()\
+                or '|' in self.line_login_id.text() or '^' in self.line_login_id.text()\
+                or ' ' in self.line_login_pw.text() or '/' in self.line_login_pw.text()\
                 or '|' in self.line_login_pw.text() or '^' in self.line_login_pw.text():
             QMessageBox.warning(self, '금지어 포함', '공백, /, |, ^는 사용할 수 없습니다')
             if ' ' in self.line_login_id.text() or '/' in self.line_login_id.text()\
@@ -237,7 +224,6 @@ class Main(QMainWindow, clientui):
                     break
             if rcv.decode() == '^OK':
                 QMessageBox.about(self, '로그인 성공', '로그인을 환영합니다')
-                # self.rcv_pageswap()  # 페이지 전환 시 상담 요청 있는지 체크하는 함수
                 self.btn_login.setDisabled(True)
                 self.radio_login_t.setAutoExclusive(False)
                 self.radio_login_s.setAutoExclusive(False)
@@ -297,9 +283,8 @@ class Main(QMainWindow, clientui):
     def quiz_add(self):  # 문제 출제 함수
         if not self.line_quiz_add_q.text() or not self.line_quiz_add_a.text():
             QMessageBox.warning(self, '입력 누락', '문제와 정답을 모두 입력해야 합니다')
-        elif '^' in self.line_quiz_add_q.text()\
-                or '/' in self.line_quiz_add_q.text() or '|' in self.line_quiz_add_q.text() \
-                or '^' in self.line_quiz_add_a.text()\
+        elif '^' in self.line_quiz_add_q.text() or '/' in self.line_quiz_add_q.text()\
+                or '|' in self.line_quiz_add_q.text() or '^' in self.line_quiz_add_a.text()\
                 or '/' in self.line_quiz_add_a.text() or '|' in self.line_quiz_add_a.text():
             QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
             if '^' in self.line_quiz_add_q.text()\
@@ -467,8 +452,8 @@ class Main(QMainWindow, clientui):
     def qna_solve(self):  # Q&A 답변하기 함수
         if not self.text_t_qna_add.toPlainText():
             QMessageBox.warning(self, '입력 누락', '답변을 입력해야 합니다')
-        elif '^' in self.text_t_qna_add.toPlainText() \
-                or '/' in self.text_t_qna_add.toPlainText() or '|' in self.text_t_qna_add.toPlainText():
+        elif '^' in self.text_t_qna_add.toPlainText() or '/' in self.text_t_qna_add.toPlainText()\
+                or '|' in self.text_t_qna_add.toPlainText():
             QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
         else:
             self.s_skt.send(f'^aadd/{self.text_t_qna_check.toPlainText().replace("질문 / ", "")}'
@@ -484,8 +469,8 @@ class Main(QMainWindow, clientui):
     def qna_add(self):  # Q&A 질문하기
         if not self.text_s_qna_add.toPlainText():
             QMessageBox.warning(self, '입력 누락', '질문을 입력해야 합니다')
-        elif '^' in self.text_s_qna_add.toPlainText() \
-                or '/' in self.text_s_qna_add.toPlainText() or '|' in self.text_s_qna_add.toPlainText():
+        elif '^' in self.text_s_qna_add.toPlainText() or '/' in self.text_s_qna_add.toPlainText()\
+                or '|' in self.text_s_qna_add.toPlainText():
             QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
         else:
             self.s_skt.send(f'^qadd/{self.text_s_qna_add.toPlainText()}/^none'.encode())
@@ -542,36 +527,37 @@ class Main(QMainWindow, clientui):
         self.stackedWidget.setCurrentIndex(11)
 
     def study_on(self):  # 학습하기 함수
-        birdcodelist = ['A000001149', 'A000001150', 'A000001151', 'A000001152', 'A000001153', 'A000001154',
-                        'A000001155', 'A000001156', 'A000001160', 'A000001161', 'A000001162', 'A000001164',
-                        'A000001165', 'A000001166', 'A000001167', 'A000001168', 'A000001169', 'A000001170',
-                        'A000001171', 'A000001172', 'A000001176', 'A000001177', 'A000001178', 'A000001180',
-                        'A000001181', 'A000001182', 'A000001183', 'A000001184', 'A000001185', 'A000001188',
-                        'A000001189', 'A000001191', 'A000001195', 'A000001197', 'A000001199', 'A000001201',
-                        'A000001204', 'A000001205', 'A000001206', 'A000001207', 'A000001209', 'A000001210',
-                        'A000001211', 'A000001213', 'A000001216', 'A000001218', 'A000001220', 'A000001221',
-                        'A000001222', 'A000001223', 'A000001224', 'A000001225', 'A000001226', 'A000001227',
-                        'A000001228', 'A000001229', 'A000001231', 'A000001233', 'A000001235', 'A000001236',
-                        'A000001239', 'A000001241', 'A000001243', 'A000001246', 'A000001248', 'A000001250',
-                        'A000001251', 'A000001253', 'A000001254', 'A000001255', 'A000001256', 'A000001257',
-                        'A000001259', 'A000001260', 'A000001261', 'A000001264', 'A000001265', 'A000001266',
-                        'A000001267', 'A000001270', 'A000001271', 'A000001273', 'A000001275', 'A000001279',
-                        'A000001280', 'A000001282', 'A000001285', 'A000001287', 'A000001291', 'A000001292',
-                        'A000001295', 'A000001299', 'A000001304', 'A000001305', 'A000001306', 'A000001307',
-                        'A000001308', 'A000001309', 'A000001310', 'A000001311', 'A000001313', 'A000001316',
-                        'A000001317', 'A000001318', 'A000001319', 'A000001320', 'A000001324', 'A000001326',
-                        'A000001327', 'A000001328', 'A000001329', 'A000001330', 'A000001333', 'A000001334',
-                        'A000001336', 'A000001337', 'A000001338', 'A000001340', 'A000001341', 'A000001344',
-                        'A000001347', 'A000001354', 'A000001355', 'A000001357', 'A000001358', 'A000001360',
-                        'A000001361', 'A000001362', 'A000001365', 'A000001366', 'A000001367', 'A000001368',
-                        'A000001369', 'A000001370', 'A000001371', 'A000001372', 'A000001374', 'A000001376',
-                        'A000001377', 'A000001383', 'A000001384', 'A000001386', 'A000001387', 'A000001388',
-                        'A000001390', 'A000001391', 'A000001393', 'A000001394', 'A000001395', 'A000001397']
-        code = random.choice(birdcodelist)
-        params = {'serviceKey': '9cCN4TXQK/nLX/tkVrz9+4qnPHIyI5sjjCpkfO9kPAH8y6fDcWtxwsp7JM0bozPvZklvvCVKqnZOig81BIMjmw==', 'q1': code}
-        bird_data = fromstring(requests.get('http://apis.data.go.kr/1400119/BirdService/birdIlstrInfo', params=params).content.decode())
-        self.text_study_name.setPlainText(bird_data[1][0][6].text)
-        self.text_study_info.setPlainText(bird_data[1][0][16].text)
+        pass
+        # birdcodelist = ['A000001149', 'A000001150', 'A000001151', 'A000001152', 'A000001153', 'A000001154',
+        #                 'A000001155', 'A000001156', 'A000001160', 'A000001161', 'A000001162', 'A000001164',
+        #                 'A000001165', 'A000001166', 'A000001167', 'A000001168', 'A000001169', 'A000001170',
+        #                 'A000001171', 'A000001172', 'A000001176', 'A000001177', 'A000001178', 'A000001180',
+        #                 'A000001181', 'A000001182', 'A000001183', 'A000001184', 'A000001185', 'A000001188',
+        #                 'A000001189', 'A000001191', 'A000001195', 'A000001197', 'A000001199', 'A000001201',
+        #                 'A000001204', 'A000001205', 'A000001206', 'A000001207', 'A000001209', 'A000001210',
+        #                 'A000001211', 'A000001213', 'A000001216', 'A000001218', 'A000001220', 'A000001221',
+        #                 'A000001222', 'A000001223', 'A000001224', 'A000001225', 'A000001226', 'A000001227',
+        #                 'A000001228', 'A000001229', 'A000001231', 'A000001233', 'A000001235', 'A000001236',
+        #                 'A000001239', 'A000001241', 'A000001243', 'A000001246', 'A000001248', 'A000001250',
+        #                 'A000001251', 'A000001253', 'A000001254', 'A000001255', 'A000001256', 'A000001257',
+        #                 'A000001259', 'A000001260', 'A000001261', 'A000001264', 'A000001265', 'A000001266',
+        #                 'A000001267', 'A000001270', 'A000001271', 'A000001273', 'A000001275', 'A000001279',
+        #                 'A000001280', 'A000001282', 'A000001285', 'A000001287', 'A000001291', 'A000001292',
+        #                 'A000001295', 'A000001299', 'A000001304', 'A000001305', 'A000001306', 'A000001307',
+        #                 'A000001308', 'A000001309', 'A000001310', 'A000001311', 'A000001313', 'A000001316',
+        #                 'A000001317', 'A000001318', 'A000001319', 'A000001320', 'A000001324', 'A000001326',
+        #                 'A000001327', 'A000001328', 'A000001329', 'A000001330', 'A000001333', 'A000001334',
+        #                 'A000001336', 'A000001337', 'A000001338', 'A000001340', 'A000001341', 'A000001344',
+        #                 'A000001347', 'A000001354', 'A000001355', 'A000001357', 'A000001358', 'A000001360',
+        #                 'A000001361', 'A000001362', 'A000001365', 'A000001366', 'A000001367', 'A000001368',
+        #                 'A000001369', 'A000001370', 'A000001371', 'A000001372', 'A000001374', 'A000001376',
+        #                 'A000001377', 'A000001383', 'A000001384', 'A000001386', 'A000001387', 'A000001388',
+        #                 'A000001390', 'A000001391', 'A000001393', 'A000001394', 'A000001395', 'A000001397']
+        # code = random.choice(birdcodelist)
+        # params = {'serviceKey': '9cCN4TXQK/nLX/tkVrz9+4qnPHIyI5sjjCpkfO9kPAH8y6fDcWtxwsp7JM0bozPvZklvvCVKqnZOig81BIMjmw==', 'q1': code}
+        # bird_data = fromstring(requests.get('http://apis.data.go.kr/1400119/BirdService/birdIlstrInfo', params=params).content.decode())
+        # self.text_study_name.setPlainText(bird_data[1][0][6].text)
+        # self.text_study_info.setPlainText(bird_data[1][0][16].text)
 
     def study_back(self):  # 학습하기 페이지 나가기 함수
         self.stackedWidget.setCurrentIndex(7)
