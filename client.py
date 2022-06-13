@@ -101,7 +101,7 @@ class Main(QMainWindow, clientui):
 
     # 회원 가입 시작
     def join_start(self):  # 회원 가입 페이지 진입 함수
-        self.s_skt.send('!join'.encode())
+        self.s_skt.send('^join'.encode())
         self.stackedWidget.setCurrentIndex(1)
         self.btn_join_id_check.setDisabled(True)
         self.btn_join_confirm.setDisabled(True)
@@ -119,18 +119,18 @@ class Main(QMainWindow, clientui):
     def join_idcheck(self):  # 아이디 중복 체크 함수
         if not self.line_join_id.text():
             QMessageBox.warning(self, '입력 누락', 'ID를 입력하셔야 합니다')
-        elif ' ' in self.line_join_id.text() or '?' in self.line_join_id.text() or '/' in self.line_join_id.text()\
+        elif ' ' in self.line_join_id.text() or '/' in self.line_join_id.text()\
                 or '|' in self.line_join_id.text() or '^' in self.line_join_id.text():
-            QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
+            QMessageBox.warning(self, '금지어 포함', '공백, /, |, ^는 사용할 수 없습니다')
             self.line_join_id.clear()
         else:
-            self.s_skt.send(f'!idcheck/{self.line_join_id.text()}'.encode())
+            self.s_skt.send(f'^idcheck/{self.line_join_id.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(16)
                 if sys.getsizeof(rcv) > 0:
                     print(f'받은 것 : {rcv.decode()}')  # 디버그-확인용 출력
                     break
-            if rcv.decode() == '!ok':
+            if rcv.decode() == '^ok':
                 QMessageBox.about(self, '사용 가능 ID', '사용이 가능한 ID입니다')
                 self.btn_join_confirm.setEnabled(True)
             else:
@@ -140,43 +140,43 @@ class Main(QMainWindow, clientui):
     def join_confirm(self):  # 회원 가입 확정 함수
         if not self.line_join_id.text() or not self.line_join_pw.text() or not self.line_join_name.text():
             QMessageBox.warning(self, '입력 누락', '모든 정보를 입력해야 합니다')
-        elif ' ' in self.line_join_id.text() or '?' in self.line_join_id.text()\
+        elif ' ' in self.line_join_id.text()\
                 or '/' in self.line_join_id.text() or '|' in self.line_join_id.text()\
                 or '^' in self.line_join_id.text() or ' ' in self.line_join_pw.text()\
-                or '?' in self.line_join_pw.text() or '/' in self.line_join_pw.text()\
+                or '/' in self.line_join_pw.text()\
                 or '|' in self.line_join_pw.text() or '^' in self.line_join_pw.text()\
-                or ' ' in self.line_join_name.text() or '?' in self.line_join_name.text()\
+                or ' ' in self.line_join_name.text()\
                 or '/' in self.line_join_name.text() or '|' in self.line_join_name.text()\
                 or '^' in self.line_join_name.text():
-            QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
-            if ' ' in self.line_join_id.text() or '?' in self.line_join_id.text() or '/' in self.line_join_id.text()\
+            QMessageBox.warning(self, '금지어 포함', '공백, /, |, ^는 사용할 수 없습니다')
+            if ' ' in self.line_join_id.text() or '/' in self.line_join_id.text()\
                     or '|' in self.line_join_id.text() or '^' in self.line_join_id.text():
                 self.line_join_id.clear()
-            if ' ' in self.line_join_pw.text() or '?' in self.line_join_pw.text() or '/' in self.line_join_pw.text()\
+            if ' ' in self.line_join_pw.text() or '/' in self.line_join_pw.text()\
                     or '|' in self.line_join_pw.text() or '^' in self.line_join_pw.text():
                 self.line_join_pw.clear()
-            if ' ' in self.line_join_name.text() or '?' in self.line_join_name.text()\
+            if ' ' in self.line_join_name.text()\
                     or '/' in self.line_join_name.text() or '|' in self.line_join_name.text()\
                     or '^' in self.line_join_name.text():
                 self.line_join_name.clear()
         elif self.line_join_pw.text() != self.line_join_pw_check.text():
             QMessageBox.warning(self, '비밀번호 불일치', '비밀번호를 다시 한번 확인해 주세요')
-            if ' ' in self.line_join_id.text() or '?' in self.line_join_id.text()\
+            if ' ' in self.line_join_id.text()\
                     or '/' in self.line_join_id.text() or '|' in self.line_join_id.text():
                 self.line_join_id.clear()
-            if ' ' in self.line_join_pw.text() or '?' in self.line_join_pw.text()\
+            if ' ' in self.line_join_pw.text()\
                     or '/' in self.line_join_pw.text() or '|' in self.line_join_pw.text():
                 self.line_join_pw.clear()
-            if ' ' in self.line_join_name.text() or '?' in self.line_join_name.text()\
+            if ' ' in self.line_join_name.text()\
                     or '/' in self.line_join_name.text() or '|' in self.line_join_name.text():
                 self.line_join_name.clear()
         else:
             if self.radio_join_t.isChecked():
-                self.s_skt.send(f'!joindata/{self.line_join_id.text()}/{self.line_join_pw.text()}'
+                self.s_skt.send(f'^joindata/{self.line_join_id.text()}/{self.line_join_pw.text()}'
                                 f'/{self.line_join_name.text()}/t'.encode())
                 QMessageBox.about(self, '회원 가입 완료', '회원 가입이 완료되었습니다')
             else:
-                self.s_skt.send(f'!joindata/{self.line_join_id.text()}/{self.line_join_pw.text()}'
+                self.s_skt.send(f'^joindata/{self.line_join_id.text()}/{self.line_join_pw.text()}'
                                 f'/{self.line_join_name.text()}/s'.encode())
                 QMessageBox.about(self, '회원 가입 완료', '회원 가입이 완료되었습니다')
             self.btn_join_id_check.setDisabled(True)
@@ -199,7 +199,7 @@ class Main(QMainWindow, clientui):
         self.btn_join_confirm.setDisabled(True)
 
     def join_back_main(self):  # 회원 가입 페이지 나가기 함수
-        self.s_skt.send('!Q_join'.encode())
+        self.s_skt.send('^Q_join'.encode())
         self.stackedWidget.setCurrentIndex(0)
         self.btn_login.setDisabled(True)
         self.radio_login_t.setAutoExclusive(False)
@@ -216,26 +216,26 @@ class Main(QMainWindow, clientui):
     def login_start(self):  # 로그인 시작 함수
         if not self.line_login_id.text() or not self.line_login_pw.text():
             QMessageBox.warning(self, '입력 누락', 'ID와 PW를 모두 입력해야 합니다')
-        elif ' ' in self.line_login_id.text() or '?' in self.line_login_id.text()\
+        elif ' ' in self.line_login_id.text()\
                 or '/' in self.line_login_id.text() or '|' in self.line_login_id.text()\
                 or '^' in self.line_login_id.text() or ' ' in self.line_login_pw.text()\
-                or '?' in self.line_login_pw.text() or '/' in self.line_login_pw.text()\
+                or '/' in self.line_login_pw.text()\
                 or '|' in self.line_login_pw.text() or '^' in self.line_login_pw.text():
-            QMessageBox.warning(self, '금지어 포함', '공백, !, /, |, ^는 사용할 수 없습니다')
-            if ' ' in self.line_login_id.text() or '?' in self.line_login_id.text() or '/' in self.line_login_id.text()\
+            QMessageBox.warning(self, '금지어 포함', '공백, /, |, ^는 사용할 수 없습니다')
+            if ' ' in self.line_login_id.text() or '/' in self.line_login_id.text()\
                     or '|' in self.line_login_id.text() or '^' in self.line_login_id.text():
                 self.line_login_id.clear()
-            if ' ' in self.line_login_pw.text() or '?' in self.line_login_pw.text() or '/' in self.line_login_pw.text()\
+            if ' ' in self.line_login_pw.text() or '/' in self.line_login_pw.text()\
                     or '|' in self.line_login_pw.text() or '^' in self.line_login_pw.text():
                 self.line_login_pw.clear()
         elif self.radio_login_t.isChecked():
-            self.s_skt.send(f'!logint/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())
+            self.s_skt.send(f'^logint/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(16)
                 if sys.getsizeof(rcv) > 0:
                     print(f'받은 것 : {rcv.decode()}')  # 디버그-확인용 출력
                     break
-            if rcv.decode() == '!OK':
+            if rcv.decode() == '^OK':
                 QMessageBox.about(self, '로그인 성공', '로그인을 환영합니다')
                 # self.rcv_pageswap()  # 페이지 전환 시 상담 요청 있는지 체크하는 함수
                 self.btn_login.setDisabled(True)
@@ -251,13 +251,13 @@ class Main(QMainWindow, clientui):
             else:
                 QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해 주세요')
         else:
-            self.s_skt.send(f'!logins/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())
+            self.s_skt.send(f'^logins/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(16)
                 if sys.getsizeof(rcv) > 0:
                     print(f'받은 것 : {rcv.decode()}')  # 디버그-확인용 출력
                     break
-            if rcv.decode() == '!NO':
+            if rcv.decode() == '^NO':
                 QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해 주세요')
                 self.line_login_id.clear()
                 self.line_login_pw.clear()
@@ -281,14 +281,14 @@ class Main(QMainWindow, clientui):
 
     # 문제 출제/풀기 시작
     def quiz_start_t(self):  # 문제 출제 페이지 진입 함수
-        self.s_skt.send('!quiz'.encode())
+        self.s_skt.send('^quiz'.encode())
         self.stackedWidget.setCurrentIndex(3)
         self.text_t_quiz.clear()
         self.line_quiz_add_q.clear()
         self.line_quiz_add_a.clear()
 
     def quiz_start_s(self):  # 문제 풀기 페이지 진입 함수
-        self.s_skt.send('!quiz'.encode())
+        self.s_skt.send('^quiz'.encode())
         self.stackedWidget.setCurrentIndex(8)
         self.text_s_quiz.clear()
         self.text_s_quized.clear()
@@ -297,32 +297,32 @@ class Main(QMainWindow, clientui):
     def quiz_add(self):  # 문제 출제 함수
         if not self.line_quiz_add_q.text() or not self.line_quiz_add_a.text():
             QMessageBox.warning(self, '입력 누락', '문제와 정답을 모두 입력해야 합니다')
-        elif '^' in self.line_quiz_add_q.text() or '?' in self.line_quiz_add_q.text() \
+        elif '^' in self.line_quiz_add_q.text()\
                 or '/' in self.line_quiz_add_q.text() or '|' in self.line_quiz_add_q.text() \
-                or '^' in self.line_quiz_add_a.text() or '?' in self.line_quiz_add_a.text() \
+                or '^' in self.line_quiz_add_a.text()\
                 or '/' in self.line_quiz_add_a.text() or '|' in self.line_quiz_add_a.text():
-            QMessageBox.warning(self, '금지어 포함', '!, /, |, ^는 사용할 수 없습니다')
-            if '^' in self.line_quiz_add_q.text() or '?' in self.line_quiz_add_q.text()\
+            QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
+            if '^' in self.line_quiz_add_q.text()\
                     or '/' in self.line_quiz_add_q.text() or '|' in self.line_quiz_add_q.text():
                 self.line_quiz_add_q.clear()
-            if '^' in self.line_quiz_add_a.text() or '?' in self.line_quiz_add_a.text()\
+            if '^' in self.line_quiz_add_a.text()\
                     or '/' in self.line_lline_quiz_add_aogin_pw.text() or '|' in self.line_quiz_add_a.text():
                 self.line_quiz_add_a.clear()
         else:
-            self.s_skt.send(f'!quizadd/{self.line_quiz_add_q.text()}/{self.line_quiz_add_a.text()}'.encode())
+            self.s_skt.send(f'^quizadd/{self.line_quiz_add_q.text()}/{self.line_quiz_add_a.text()}'.encode())
             QMessageBox.about(self, '문제 등록', '문제가 등록되었습니다')
             self.line_quiz_add_q.clear()
             self.line_quiz_add_a.clear()
 
     def quiz_check(self):  # 전체 문제 보기 함수 (교사측)
         self.text_t_quiz.clear()
-        self.s_skt.send('!check'.encode())
+        self.s_skt.send('^quizcheck'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == '!none':
+        if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
         else:
             rcvquiz = rcv.decode().split(' | ')
@@ -334,13 +334,13 @@ class Main(QMainWindow, clientui):
 
     def quiz_list(self):  # 문제 받기 함수 (학생측)
         self.line_quiz_solve.clear()
-        self.s_skt.send('!quizlist/'.encode())
+        self.s_skt.send('^quizlist/'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == '!none':
+        if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
         else:
             self.text_s_quiz.setPlainText(f'{rcv.decode()}')
@@ -348,18 +348,18 @@ class Main(QMainWindow, clientui):
     def quiz_solve(self):  # 문제 답변 함수
         if not self.line_quiz_solve.text():
             QMessageBox.warning(self, '입력 누락', '정답을 입력해야 합니다')
-        elif '^' in self.line_quiz_solve.text() or '?' in self.line_quiz_solve.text() \
+        elif '^' in self.line_quiz_solve.text()\
                 or '/' in self.line_quiz_solve.text() or '|' in self.line_quiz_solve.text():
-            QMessageBox.warning(self, '금지어 포함', '!, /, |, ^는 사용할 수 없습니다')
+            QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
             self.line_quiz_solve.clear()
         else:
-            self.s_skt.send(f'!quizstart/{self.text_s_quiz.toPlainText()}/{self.line_quiz_solve.text()}'.encode())
+            self.s_skt.send(f'^quizstart/{self.text_s_quiz.toPlainText()}/{self.line_quiz_solve.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(32)
                 if sys.getsizeof(rcv) > 0:
                     print(f'받은 것 : {rcv.decode()}')
                     break
-            if rcv.decode() == '!OK':
+            if rcv.decode() == '^OK':
                 QMessageBox.about(self, '결과', '정답입니다')
                 self.text_s_quized.append(f'문제 : {self.text_s_quiz.toPlainText()}')
                 self.text_s_quized.append(f'정답 : {self.line_quiz_solve.text()}')
@@ -372,11 +372,11 @@ class Main(QMainWindow, clientui):
                 self.line_quiz_solve.clear()
 
     def quiz_back_t(self):  # 문제 출제 페이지 나가기 함수
-        self.s_skt.send('!quizend/'.encode())
+        self.s_skt.send('^quizend/'.encode())
         self.stackedWidget.setCurrentIndex(2)
 
     def quiz_back_s(self):  # 문제 풀기 페이지 나가기 함수
-        self.s_skt.send('!quizend/'.encode())
+        self.s_skt.send('^quizend/'.encode())
         self.stackedWidget.setCurrentIndex(7)
     # 문제 출제/풀기 끝
 
@@ -400,13 +400,13 @@ class Main(QMainWindow, clientui):
     def qna_check_t(self):  # Q&A 확인 함수 (교사측)
         self.combo_t_qna.clear()
         self.combo_t_qna.addItem('Q&A 질문|답변 목록')
-        self.s_skt.send('!qnacheck'.encode())
+        self.s_skt.send('^qnacheck'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == '!none':
+        if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
         else:
             rcvqna = rcv.decode().split(' | ')
@@ -419,13 +419,13 @@ class Main(QMainWindow, clientui):
     def qna_check_s(self):  # Q&A 확인 함수 (학생측)
         self.combo_s_qna.clear()
         self.combo_s_qna.addItem('Q&A 질문|답변 목록')
-        self.s_skt.send('!qnacheck'.encode())
+        self.s_skt.send('^qnacheck'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == '!none':
+        if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
         else:
             rcvqna = rcv.decode().split(' | ')
@@ -467,11 +467,11 @@ class Main(QMainWindow, clientui):
     def qna_solve(self):  # Q&A 답변하기 함수
         if not self.text_t_qna_add.toPlainText():
             QMessageBox.warning(self, '입력 누락', '답변을 입력해야 합니다')
-        elif '^' in self.text_t_qna_add.toPlainText() or '?' in self.text_t_qna_add.toPlainText() \
+        elif '^' in self.text_t_qna_add.toPlainText() \
                 or '/' in self.text_t_qna_add.toPlainText() or '|' in self.text_t_qna_add.toPlainText():
-            QMessageBox.warning(self, '금지어 포함', '!, /, |, ^는 사용할 수 없습니다')
+            QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
         else:
-            self.s_skt.send(f'!aadd/{self.text_t_qna_check.toPlainText().replace("질문 / ", "")}'
+            self.s_skt.send(f'^aadd/{self.text_t_qna_check.toPlainText().replace("질문 / ", "")}'
                             f'/{self.text_t_qna_add.toPlainText()}'.encode())
             qsi = self.combo_t_qna.currentIndex()
             qst = self.combo_t_qna.currentText().split(' | ')
@@ -484,11 +484,11 @@ class Main(QMainWindow, clientui):
     def qna_add(self):  # Q&A 질문하기
         if not self.text_s_qna_add.toPlainText():
             QMessageBox.warning(self, '입력 누락', '질문을 입력해야 합니다')
-        elif '^' in self.text_s_qna_add.toPlainText() or '?' in self.text_s_qna_add.toPlainText() \
+        elif '^' in self.text_s_qna_add.toPlainText() \
                 or '/' in self.text_s_qna_add.toPlainText() or '|' in self.text_s_qna_add.toPlainText():
-            QMessageBox.warning(self, '금지어 포함', '!, /, |, ^는 사용할 수 없습니다')
+            QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
         else:
-            self.s_skt.send(f'!qadd/{self.text_s_qna_add.toPlainText()}/^none'.encode())
+            self.s_skt.send(f'^qadd/{self.text_s_qna_add.toPlainText()}/^none'.encode())
             self.text_s_qna_add.clear()
 
     def qna_back_t(self):  # Q&A 페이지 나가기 함수 (교사측)

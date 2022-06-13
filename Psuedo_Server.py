@@ -36,41 +36,41 @@ class ChatServer:
                 break
             self.last_rcv_msg = inc_msg.decode()
             print(f'받은 것 : {self.last_rcv_msg}')
-            if self.last_rcv_msg[0] == '!':
+            if self.last_rcv_msg[0] == '^':
                 cmd = self.last_rcv_msg.split('/')
-                if cmd[0] == '!idcheck':
+                if cmd[0] == '^idcheck':
                     if cmd[1] == '1234':
-                        self.snd_client('!no')
+                        self.snd_client('^no')
                     else:
-                        self.snd_client('!ok')
-                elif cmd[0] == '!logint':
+                        self.snd_client('^ok')
+                elif cmd[0] == '^logint':
                     if cmd[1] == '1234':
-                        self.snd_client('!NO')
+                        self.snd_client('^NO')
                     else:
-                        self.snd_client('!OK')
-                elif cmd[0] == '!logins':
+                        self.snd_client('^OK')
+                elif cmd[0] == '^logins':
                     if cmd[1] == '1234':
-                        self.snd_client('!NO')
+                        self.snd_client('^NO')
                     else:
-                        self.snd_client('!OK')
-                elif cmd[0] == '!check':
+                        self.snd_client('^OK')
+                elif cmd[0] == '^quizcheck':
                     if random.randint(1, 2) == 1:
-                        self.snd_client('!none')
+                        self.snd_client('^none')
                     else:
                         self.snd_client('이것은 문제1 | 이것은 답1 | 이것은 문제2 | 이것은 답2')
-                elif cmd[0] == '!quizlist':
+                elif cmd[0] == '^quizlist':
                     if random.randint(1, 2) == 1:
-                        self.snd_client('!none')
+                        self.snd_client('^none')
                     else:
                         self.snd_client('이것은 문제1')
-                elif cmd[0] == '!quizstart':
+                elif cmd[0] == '^quizstart':
                     if random.randint(1, 2) == 1:
-                        self.snd_client('!OK')
+                        self.snd_client('^OK')
                     else:
-                        self.snd_client('!NO')
-                elif cmd[0] == '!qnacheck':
+                        self.snd_client('^NO')
+                elif cmd[0] == '^qnacheck':
                     if random.randint(1, 2) == 1:
-                        self.snd_client('!none')
+                        self.snd_client('^none')
                     else:
                         self.snd_client('질문1 | 답변1 | 질문2 | ^none | 질문3 | 답변3 | 질문4 | ^none')
             else:
