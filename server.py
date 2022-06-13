@@ -57,6 +57,13 @@ def handle_clnt(clnt_sock):
             if clnt_msg.startswith('quiz'):
                 clnt_msg = clnt_msg.replace('quiz', '')
                 clas.Menu.Quiz(clnt_msg, clnt_info, clnt_num)
+
+            if clnt_msg.startswith('study'):
+                clnt_msg = clnt_msg.replace('study', '')
+                clas.Menu.Student_Study(clnt_msg, clnt_info, clnt_num)
+            if clnt_msg.startswith('info'):
+                clnt_msg = clnt_msg.replace('info', '')
+                clas.Menu.Student_info(clnt_msg, clnt_info, clnt_num)
         else:
             continue
 

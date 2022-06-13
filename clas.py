@@ -7,10 +7,10 @@ BUF_SIZE = 1024
 lock = threading.Lock()
 
 
-def dbcon():
+def dbopen():
     con = sqlite3.connect('edu.db')  # DB 연결
     c = con.cursor()                  # 커서
-    return (con, c)
+    return con, c
 
 
 class Msg:
@@ -30,7 +30,7 @@ class Msg:
 
 class Join_n_login:  # 회원가입, 로그인 시작
     def join(sock, clnt_cnt):  # 회원가입 시작
-        con, c = dbcon()
+        con, c = dbopen()
         user_data = []
         while True:
             ck_login = 0
@@ -83,10 +83,9 @@ class Join_n_login:  # 회원가입, 로그인 시작
 # 화원가입 종료
 
     def log_in(sock, data, clnt_info, n):  # 로그인 시작
-        con, c = dbcon()
-        print(data)
         data = data.split('/')
         user_id = data[1]
+        con, c = dbopen()
 
         if 's' in data[0]:
             c.execute("SELECT PW FROM student WHERE ID=?",
@@ -126,12 +125,13 @@ class Join_n_login:  # 회원가입, 로그인 시작
 
 class Menu:
     def Quiz(msg, info, n):  # 문제 관련 함수
+        lock.acquire()
+        con, c = dbopen()
         sock = info[n][0]
         Q_msg = ''
         print(info)
         if 'check' in msg:
             Quizs = ''
-            con, c = dbcon()
             c.execute("SELECT who,Quiz,Answer FROM quiz")  # 누구에게/문제/답 을 가져온다
             while True:
                 data = c.fetchone()  # 한 행 추출
@@ -158,8 +158,8 @@ class Menu:
 
                     query = "INSERT INTO quiz(who,Quiz,Answer) VALUES(?, ?, ?)"
                     c.executemany(query, (Q_msg,))  # 데이터베이스에 누가/무슨 문제를/답 을 넣는다
-                    con.commit()            # DB에 커밋
-                    con.close()
+                    con.commit()
+                    break
 
                 if Q_msg.startswith('!quizlist/') and 's' == info[n][5]:
                     Q_msg = Q_msg.replace('!quizlist/', '')
@@ -177,5 +177,70 @@ class Menu:
                     else:
                         sock.send('!NO'.encode())  # 틀렷다고 알려줌
                     # 서버에서 보내준 정답을 받을곳
-
+        lock.release()
+        con.close()
         # 문제관련 함수 끝
+
+    def Student_Study(msg, info, n):  # 학습하기
+        con, c = dbopen()
+        sock = info[n][0]
+        lock.acquire()
+        if msg.startswith('save/'):
+            msg = msg.replace('save/', '')
+            c.execute("SELECT study FROM student WHERE ID=?",
+                      (info[1],))  # 해당 학생의 공부내용을 불러오기
+            temp = c.fetchone()
+            temp = ','.join(temp)  # 현재까지 공부한 내용 코드를 문자열로 바꿈
+            temp = temp+','+msg  # 추가될 코드를 문자열에 더함
+            c.executemany("UPDATE Users SET study = ? WHERE id = ?",
+                          (temp, info[1]))  # 데이터베이스에 저장
+            con.commit()  # db에 커밋
+        if msg.startswith('view'):
+            c.execute("SELECT study FROM student WHERE ID=?",
+                      (info[1],))  # 해당 학생이 공부한 내용 가져오기
+            temp = c.fetchone()
+            temp = ','.join(temp)  # 문자열로 변경
+            sock.send(temp.encode())  # 클라로 보내기
+        lock.release()
+        con.close()
+# 학습하기 끝
+
+    def Student_info(msg, info, n):  # 학생 통계
+        con, c = dbopen()
+        sock = info[n][0]
+        if msg.startswith('list'):
+            lock.acquire()
+            c.execute("SELECT name FROM student")  # 모든 학생들의 이름을 가져와서
+            S_list = c.fetchall()
+            S_list = ','.join(S_list)  # 튜플형태의 학생이름들을 문자열로 변환
+            sock.send(S_list.encode())  # 보내기
+            lock.release()
+            con.close()
+
+        if msg.startswith('study'):
+            lock.acquire()
+            msg = msg.replace('study/', '')
+            c.execute("SELECT study FROM student WHERE name=?",
+                      (msg,))  # 검색된 학생의 지금까지의 공부내용 가져오기
+            temp = c.fetchone()
+            if sys.getsizeof(temp) > 0:  # 공부한 내용이 있는지 없는지 확인
+                temp = ','.join(temp)
+            else:
+                temp = "현재까지 공부한 내용이 없습니다"
+            sock.send(temp.encode())
+            lock.release()
+
+        if msg.startswith('quiz'):
+            lock.acquire()
+            msg = msg.replace('quiz/', '')
+            c.execute("SELECT name FROM quiz WHERE name=?",
+                      (msg,))  # 검색한 학생의 문제풀이 상황 가져오기
+            temp = c.fetchone()
+            if sys.getsizeof(temp) > 0:  # 있는지 없는지 확인
+                temp = ','.join(temp)
+            else:
+                temp = "현재까지 받은 문제가 없습니다"
+            sock.send(temp.encode())
+            lock.release()
+        con.close()
+# 학생 통계 끝
