@@ -26,7 +26,7 @@ class Main(QMainWindow, clientui):
         super().__init__()
         self.setupUi(self)
         self.s_skt = socket(AF_INET, SOCK_STREAM)
-        self.s_skt.connect(('127.0.0.1', 25000))
+        self.s_skt.connect(('127.0.0.1', 25001))
         self.stackedWidget.setCurrentIndex(0)
         # 메인 페이지
         self.btn_join.clicked.connect(self.join_start)
