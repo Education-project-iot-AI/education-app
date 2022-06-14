@@ -507,7 +507,7 @@ class Main(QMainWindow, clientui):
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == '다른 선생님이 상담하고있습니다':  # no 신호 정해야 됨
+        if rcv.decode() == '^NO':  # no 신호 정해야 됨
             QMessageBox.warning(self, '상담방', '다른 선생님이 상담하고 있습니다')
         else:  # ok 신호 안 정하면 반드시 터짐
             self.stackedWidget_t.setCurrentIndex(1)
@@ -524,7 +524,7 @@ class Main(QMainWindow, clientui):
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == '다른 학생이 상담하고있습니다':  # no 신호 정해야 됨
+        if rcv.decode() == '^NO':  # no 신호 정해야 됨
             QMessageBox.warning(self, '상담방', '다른 학생이 상담하고 있습니다')
         else:  # ok 신호 안 정하면 반드시 터짐
             self.stackedWidget_s.setCurrentIndex(1)
