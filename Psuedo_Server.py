@@ -11,7 +11,7 @@ class ChatServer:
         self.last_rcv_msg = ''
         self.s_skt = socket(AF_INET, SOCK_STREAM)
         self.ip = ''
-        self.port = 25000
+        self.port = 25001
         self.s_skt.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.s_skt.bind((self.ip, self.port))
         print('클라이언트 접속 대기 중...')
@@ -73,8 +73,12 @@ class ChatServer:
                         self.snd_client('^none')
                     else:
                         self.snd_client('질문1 | 답변1 | 질문2 | ^none | 질문3 | 답변3 | 질문4 | ^none')
+                elif cmd[0] == '^counsel':
+                    self.snd_client('^OK')
+                elif cmd[0] == '^counselend':
+                    self.snd_client('^end')
             else:
-                pass
+                self.snd_client(self.last_rcv_msg)
         c_skt.close()
 
     def snd_client(self, snd_msg):

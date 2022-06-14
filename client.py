@@ -11,7 +11,9 @@ import sys
 # import requests
 # import random
 from socket import *
-from PyQt5 import uic, QtCore
+from threading import *
+from PyQt5 import uic
+# from PyQt5 import QtCore
 # from PyQt5.QtGui import *  # 이하 모듈 계속 안 쓰면 삭제 예정
 # from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -28,6 +30,10 @@ class Main(QMainWindow, clientui):
         self.s_skt = socket(AF_INET, SOCK_STREAM)
         self.s_skt.connect(('127.0.0.1', 25001))
         self.stackedWidget.setCurrentIndex(0)
+
+        self.flag_t = True
+        self.flag_s = True
+
         # 메인 페이지
         self.btn_join.clicked.connect(self.join_start)
         self.btn_login.clicked.connect(self.login_start)
@@ -58,7 +64,8 @@ class Main(QMainWindow, clientui):
         # 상담 수락 페이지
         self.btn_t_counsel_back.clicked.connect(self.counsel_back_t)
         self.btn_t_snd.clicked.connect(self.counsel_snd_t)
-        self.btn_t_counsel_ok.clicked.connect(self.counsel_ok)
+        self.btn_t_end.clicked.connect(self.counsel_end_t)
+        self.btn_t_counsel_ok.clicked.connect(self.counsel_go_t)
         # 통계보기 페이지
         self.btn_t_info_back.clicked.connect(self.info_back)
         self.btn_t_info_show.clicked.connect(self.info_show)
@@ -80,7 +87,8 @@ class Main(QMainWindow, clientui):
         # 상담 요청 페이지
         self.btn_s_counsel_back.clicked.connect(self.counsel_back_s)
         self.btn_s_snd.clicked.connect(self.counsel_snd_s)
-        self.btn_s_counsel_call.clicked.connect(self.counsel_call)
+        self.btn_s_end.clicked.connect(self.counsel_end_s)
+        self.btn_s_counsel_call.clicked.connect(self.counsel_go_s)
         # 학습하기 페이지
         self.btn_s_study_back.clicked.connect(self.study_back)
         self.btn_s_study_on.clicked.connect(self.study_on)
@@ -357,11 +365,11 @@ class Main(QMainWindow, clientui):
                 self.line_quiz_solve.clear()
 
     def quiz_back_t(self):  # 문제 출제 페이지 나가기 함수
-        self.s_skt.send('^quizend/'.encode())
+        # self.s_skt.send('^quizend/'.encode())
         self.stackedWidget.setCurrentIndex(2)
 
     def quiz_back_s(self):  # 문제 풀기 페이지 나가기 함수
-        self.s_skt.send('^quizend/'.encode())
+        # self.s_skt.send('^quizend/'.encode())
         self.stackedWidget.setCurrentIndex(7)
     # 문제 출제/풀기 끝
 
@@ -485,27 +493,119 @@ class Main(QMainWindow, clientui):
 
     # 상담 받기/신청 시작
     def counsel_start_t(self):  # 상담 받기 페이지 진입 함수
+        self.stackedWidget_t.setCurrentIndex(0)
         self.stackedWidget.setCurrentIndex(5)
 
     def counsel_start_s(self):  # 상담 신청 페이지 진입 함수
+        self.stackedWidget_s.setCurrentIndex(0)
         self.stackedWidget.setCurrentIndex(10)
 
-    def counsel_ok(self):  # 상담 받기 함수
-        pass
+    def counsel_go_t(self):  # 상담 시작 함수 (교사측)
+        self.s_skt.send('^counsel'.encode())
+        while True:
+            rcv = self.s_skt.recv(1024)
+            if sys.getsizeof(rcv) > 0:
+                print(f'받은 것 : {rcv.decode()}')
+                break
+        if rcv.decode() == '다른 선생님이 상담하고있습니다':  # no 신호 정해야 됨
+            QMessageBox.warning(self, '상담방', '다른 선생님이 상담하고 있습니다')
+        else:  # ok 신호 안 정하면 반드시 터짐
+            self.stackedWidget_t.setCurrentIndex(1)
+            self.text_t_counsel.clear()
+            self.line_t_snd.clear()
+            th_t = Thread(target=self.counsel_rcv_t, args=(self.s_skt,))
+            self.flag_t = True
+            th_t.start()
 
-    def counsel_call(self):  # 상담 요청 함수
-        pass
+    def counsel_go_s(self):  # 상담 요청 함수 (학생측)
+        self.s_skt.send('^counsel'.encode())
+        while True:
+            rcv = self.s_skt.recv(1024)
+            if sys.getsizeof(rcv) > 0:
+                print(f'받은 것 : {rcv.decode()}')
+                break
+        if rcv.decode() == '다른 학생이 상담하고있습니다':  # no 신호 정해야 됨
+            QMessageBox.warning(self, '상담방', '다른 학생이 상담하고 있습니다')
+        else:  # ok 신호 안 정하면 반드시 터짐
+            self.stackedWidget_s.setCurrentIndex(1)
+            self.text_s_counsel.clear()
+            self.line_s_snd.clear()
+            th_s = Thread(target=self.counsel_rcv_s, args=(self.s_skt,))
+            self.flag_s = True
+            th_s.start()
+
+    def counsel_rcv_t(self, s_skt):
+        print(f'교사 수신 스레드 시작 {active_count()}')  # 디버그 - 확인용 메시지
+        while self.flag_t:
+            rcv_msg = s_skt.recv(1024)
+            if not self.flag_t:
+                break
+            if not rcv_msg:
+                print('연결 종료')
+                break
+            print(f'받은 것 : {rcv_msg.decode()}')  # 디버그 - 확인용 메시지
+            self.text_t_counsel.append(rcv_msg.decode())
+        print(f'교사 수신 스레드 종료? {active_count()}')  # 디버그 - 확인용 메시지
+
+    def counsel_rcv_s(self, s_skt):
+        print(f'학생 수신 스레드 시작 {active_count()}')  # 디버그 - 확인용 메시지
+        while self.flag_s:
+            rcv_msg = s_skt.recv(1024)
+            if not self.flag_s:
+                break
+            if not rcv_msg:
+                print('연결 종료')
+                break
+            print(f'받은 것 : {rcv_msg.decode()}')  # 디버그 - 확인용 메시지
+            self.text_s_counsel.append(rcv_msg.decode())
+        print(f'학생 수신 스레드 종료? {active_count()}')  # 디버그 - 확인용 메시지
 
     def counsel_snd_t(self):  # 상담 대화 전송 함수 (교사측)
-        pass
+        if not self.line_t_snd.text():
+            QMessageBox.warning(self, '입력 누락', '상담 내용을 입력해야 합니다')
+        elif '^' in self.line_t_snd.text() or '/' in self.line_t_snd.text()\
+                or '|' in self.line_t_snd.text():
+            QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
+        else:
+            self.s_skt.send(self.line_t_snd.text().encode())
+            self.line_t_snd.clear()
 
     def counsel_snd_s(self):  # 상담 대화 전송 함수 (학생측)
-        pass
+        if not self.line_s_snd.text():
+            QMessageBox.warning(self, '입력 누락', '상담 내용을 입력해야 합니다')
+        elif '^' in self.line_s_snd.text() or '/' in self.line_s_snd.text()\
+                or '|' in self.line_s_snd.text():
+            QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
+        else:
+            self.s_skt.send(self.line_s_snd.text().encode())
+            self.line_s_snd.clear()
+
+    def counsel_end_t(self):
+        self.s_skt.send('^counselend'.encode())
+        # 스레드 멈추는 구문 필요함
+        self.flag_t = False
+        self.stackedWidget_t.setCurrentIndex(0)
+
+    def counsel_end_s(self):
+        self.s_skt.send('^counselend'.encode())
+        # 스레드 멈추는 구문 필요함
+        self.flag_s = False
+        self.stackedWidget_s.setCurrentIndex(0)
 
     def counsel_back_t(self):  # 상담 받기 페이지 나가기 함수
+        if self.stackedWidget_t.currentIndex() == 1:
+            self.s_skt.send('^counselend'.encode())
+            # 스레드 멈추는 구문 필요함
+            self.flag_t = False
+            self.stackedWidget_t.setCurrentIndex(0)
         self.stackedWidget.setCurrentIndex(2)
 
     def counsel_back_s(self):  # 상담 신청 페이지 나가기 함수
+        if self.stackedWidget_s.currentIndex() == 1:
+            self.s_skt.send('^counselend'.encode())
+            # 스레드 멈추는 구문 필요함
+            self.flag_s = False
+            self.stackedWidget_s.setCurrentIndex(0)
         self.stackedWidget.setCurrentIndex(7)
     # 상담 받기/신청 끝
 
