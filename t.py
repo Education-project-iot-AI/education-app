@@ -1,5 +1,9 @@
-a = '!aadd/1/2/3'
+a = '45'
 
-a= a.replace('!aadd/','')
+b = '75'
 
-print(a)
+c = int(a) + int (b)
+
+print(type(c))
+
+print(c)
