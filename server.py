@@ -5,7 +5,7 @@ import clas
 clnt_sock = []
 clnt_info = []  # [sock, id, type,]
 clnt_cnt = 0
-PORT = 25000
+PORT = 25001
 BUF_SIZE = 1024
 msg = ''
 lock = threading.Lock()
@@ -67,6 +67,10 @@ def handle_clnt(clnt_sock):
             if clnt_msg.startswith('counsel'):
                 clnt_msg = clnt_msg.replace('counsel', '')
                 clas.Menu.Sangdam(clnt_msg, clnt_info, clnt_num)
+
+            if clnt_msg.startswith('qna'):
+                clnt_msg = clnt_msg.replace('qna', '')
+                clas.Menu.question(clnt_msg, clnt_info, clnt_num)
         else:
             continue
 
