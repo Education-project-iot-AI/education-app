@@ -113,6 +113,11 @@ class Join_n_login:  # 회원가입, 로그인 시작
             else:
                 clnt_info[n].append(data[0])
                 sock.send('^OK'.encode())
+
+            c.execute("SELECT name FROM student WHERE ID=?",
+                      (user_id,))
+            name = ''.join(c.fetchone())
+            clnt_info[n].append(name)
         else:
             # 로그인실패 시그널
             sock.send('^NO'.encode())
@@ -126,6 +131,7 @@ class Menu:
     def Quiz(msg, info, n):  # 문제 관련 함수
         con, c = dbopen()
         sock = info[n][0]
+        name = info[n][4]
         id = info[n][2]
         ck_answer = 0
         Quiz_list = []
@@ -170,10 +176,10 @@ class Menu:
                     temp = c.fetchone()
 
                     if temp == ('X',):
-                        temp = id
+                        temp = name
                     else:
                         temp = ','.join(c.fetchone)
-                        temp = temp + ',' + id
+                        temp = temp + ',' + name
 
                     c.execute("UPDATE quiz SET who = ? WHERE Quiz = ?",
                               (temp, i[0]))  # 데이터베이스에 저장
@@ -248,16 +254,17 @@ class Menu:
             lock.release()
 
         if msg.startswith('quiz/'):
+            s_list = []
             lock.acquire()
             msg = msg.replace('quiz/', '')
-            c.execute("SELECT name FROM quiz WHERE name=?",
-                      (msg,))  # 검색한 학생의 문제풀이 상황 가져오기
-            temp = c.fetchone()
-            if sys.getsizeof(temp) > 0:  # 있는지 없는지 확인
-                temp = ','.join(temp)
-            else:
-                temp = "현재까지 받은 문제가 없습니다"
-            sock.send(temp.encode())
+            c.execute("SELECT Quiz,who FROM quiz")  # 검색한 학생의 문제풀이 상황 가져오기
+            for row in c:
+                if row != ('X',) and row[1] in msg:
+                    row = list(row)
+                    s_list.append(row[0])
+            s_list = ','.join(s_list)
+
+            sock.send(s_list.encode())
             lock.release()
         con.close()
 # 학생 통계 끝
