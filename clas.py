@@ -274,11 +274,11 @@ class Menu:
         con.close()
 # 학생 통계 끝
 
-    def Sangdam(msg, info, n):
+    def Sangdam(msg, info, n): #채팅 시작
         global s_join, t_join
         sock = info[n][0]
         msg = ''
-        if s_join != 0 and info[n][3] == 's':
+        if s_join != 0 and info[n][3] == 's': #상담중인 사람이 있을 시
             sock.send("다른 학생이 상담하고있습니다".encode())
             return
         if t_join != 0 and info[n][3] == 't':
@@ -288,14 +288,14 @@ class Menu:
             s_join = 1
         else:
             t_join = 1
-        info[n][1] = 1
+        info[n][1] = 1  #[n][1]이 1인 사람에게만 채팅이 들어감
         name = info[n][4]
         print("들어옴")
         while True:
             msg = sock.recv(BUF_SIZE)
             msg = msg.decode()
 
-            if msg.startswith('^Q_chat') or not msg:
+            if msg.startswith('^Q_chat') or not msg:    #나갈때
                 if info[n][3] == 's':
                     s_join = 0
                 else:
@@ -307,5 +307,5 @@ class Menu:
                 if C_sock[1] == 1:
                     if info[n][0] != C_sock[0]:
                         C_sock = C_sock[0]
-                        msg = name + ' : ' + msg
+                        msg = name + ' : ' + msg#메세지에 이름 추가
                         C_sock.send(msg.encode())
