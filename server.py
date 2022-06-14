@@ -5,7 +5,7 @@ import clas
 clnt_sock = []
 clnt_info = []  # [sock, id, type,]
 clnt_cnt = 0
-PORT = 25001
+PORT = 25000
 BUF_SIZE = 1024
 msg = ''
 lock = threading.Lock()
@@ -18,6 +18,7 @@ def delete_imfor(clnt_sock):  # 클라이언트 접속해제
             print('exit client')
             while i < clnt_cnt - 1:
                 clnt_info[i] = clnt_info[i + 1]
+
                 i += 1
             break
     clnt_cnt -= 1

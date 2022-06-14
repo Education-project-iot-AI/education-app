@@ -4,7 +4,7 @@ import socket
 
 BUF_SIZE = 2048
 IP = "127.0.0.1"
-Port = 25001
+Port = 25000
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((IP, Port))
 
@@ -21,5 +21,5 @@ t = threading.Thread(target=recv, args=(sock,))
 t.start()
 
 while True:
-    msg = input("입력 : ")
+    msg = input("")
     sock.send(msg.encode())

@@ -4,6 +4,8 @@ import sqlite3
 import threading
 
 BUF_SIZE = 1024
+s_join = 0
+t_join = 0
 
 lock = threading.Lock()
 
@@ -113,9 +115,12 @@ class Join_n_login:  # 회원가입, 로그인 시작
             else:
                 clnt_info[n].append(data[0])
                 sock.send('^OK'.encode())
-
-            c.execute("SELECT name FROM student WHERE ID=?",
-                      (user_id,))
+            if 's' in data[0]:
+                c.execute("SELECT name FROM student WHERE ID=?",
+                          (user_id,))
+            else:
+                c.execute("SELECT name FROM teacher WHERE ID=?",
+                          (user_id,))
             name = ''.join(c.fetchone())
             clnt_info[n].append(name)
         else:
@@ -268,4 +273,39 @@ class Menu:
             lock.release()
         con.close()
 # 학생 통계 끝
-#    def Sangdam(msg,info,n):
+
+    def Sangdam(msg, info, n):
+        global s_join, t_join
+        sock = info[n][0]
+        msg = ''
+        if s_join != 0 and info[n][3] == 's':
+            sock.send("다른 학생이 상담하고있습니다".encode())
+            return
+        if t_join != 0 and info[n][3] == 't':
+            sock.send("다른 선생님이 상담하고있습니다".encode())
+            return
+        if info[n][3] == 's':
+            s_join = 1
+        else:
+            t_join = 1
+        info[n][1] = 1
+        name = info[n][4]
+        print("들어옴")
+        while True:
+            msg = sock.recv(BUF_SIZE)
+            msg = msg.decode()
+
+            if msg.startswith('^Q_chat') or not msg:
+                if info[n][3] == 's':
+                    s_join = 0
+                else:
+                    t_join = 0
+                info[n][1] = 0
+                break
+
+            for C_sock in info:
+                if C_sock[1] == 1:
+                    if info[n][0] != C_sock[0]:
+                        C_sock = C_sock[0]
+                        msg = name + ' : ' + msg
+                        C_sock.send(msg.encode())
