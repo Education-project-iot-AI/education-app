@@ -156,6 +156,7 @@ class Menu:
                 i = i.split(',')
                 if msg[0] == i[0] and msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
                     if id in i[3]:
+                        sock.send("이미 답을 낸 문제입니다".encode())
                         break
                     c.execute("SELECT point FROM student WHERE ID = ?",
                               (id,))
@@ -165,12 +166,20 @@ class Menu:
                     c.execute("UPDATE student SET point = ? WHERE id = ?",
                               (addpoint, id))  # 데이터베이스에 저장
                     con.commit()
-                    #c.executemany("SELECT who FROM quiz")
-                    #temp = ''.join(c.fetchone)
-                    #temp = temp + ',' + id
-                    # c.executemany("UPDATE quiz SET who = ? WHERE Quiz = ?",
-                    #              (temp, id))  # 데이터베이스에 저장
-                    # sock.send('^OK'.encode())  # 맞췃다고 알려줌
+                    c.execute("SELECT who FROM quiz")
+                    temp = c.fetchone()
+
+                    if temp == ('X',):
+                        temp = id
+                    else:
+                        temp = ','.join(c.fetchone)
+                        temp = temp + ',' + id
+
+                    c.execute("UPDATE quiz SET who = ? WHERE Quiz = ?",
+                              (temp, i[0]))  # 데이터베이스에 저장
+                    con.commit()
+
+                    sock.send('^OK'.encode())  # 맞췃다고 알려줌
                     ck_answer = 1
                     break
             if ck_answer != 1:
