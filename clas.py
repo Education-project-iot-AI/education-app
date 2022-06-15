@@ -140,6 +140,8 @@ class Menu:
         con, c = dbopen()
         sock = info[n][0]
         name = info[n][4]
+        print(info[n])
+        print(name)
         id = info[n][2]
         ck_answer = 0
         Quiz_list = []
@@ -147,13 +149,14 @@ class Menu:
         # 문제/답/점수/현재까지 정답을 말한 인원을 가져온다
         c.execute("SELECT Quiz,Answer,point,who,fail FROM quiz")
         for row in c:
-            print(row)
-            row = ','.join(row)
+            print('row', row)
+            row = '^'.join(row)
             Quizs = Quizs + row + ' | '  # 하나로 합친다
         Quiz_list = Quizs.split(' | ')
         lock.acquire()
         if 'check' in msg:
             if len(Quizs) > 0:
+                print('Quizs :', Quizs)
                 sock.send(Quizs.encode())  # 전송한다
             else:
                 sock.send('^none'.encode())  # 전송한다
@@ -171,8 +174,9 @@ class Menu:
             msg = msg.replace('start/', '')  # 문제를 푼다고 할 시
             msg = msg.split('/')  # 문제/입력한 답을 리스트화
             for i in Quiz_list:
-                i = i.split(',')
-                if id in i[3]:
+                i = i.split('^')
+                print(i)
+                if id in i[3] or id in i[4]:  # 작동안됨 수정해야함
                     sock.send("이미 답을 낸 문제입니다".encode())
                     break
                 if msg[0] == i[0] and msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
@@ -186,12 +190,14 @@ class Menu:
                     con.commit()
                     c.execute("SELECT who FROM quiz")
                     temp = c.fetchone()
+                    print(temp)
 
                     if temp == ('X',):
                         temp = name
                     else:
-                        temp = '^'.join(c.fetchone())
-                        temp = temp + '^' + name
+                        temp = list(temp)
+                        temp = '|'.join(temp)
+                        temp = temp + '|' + name
 
                     c.execute("UPDATE quiz SET who = ? WHERE Quiz = ?",
                               (temp, i[0]))  # 데이터베이스에 저장
@@ -200,19 +206,22 @@ class Menu:
                     sock.send('^OK'.encode())  # 맞췃다고 알려줌
                     ck_answer = 1
                     break
-                else:
+                elif msg[0] == i[0] and msg[1] != i[1]:
                     c.execute("SELECT fail FROM quiz")
                     temp = c.fetchone()
+                    print(temp)
 
                     if temp == ('X',):
                         temp = name
                     else:
-                        temp = '^'.join(c.fetchone())
-                        temp = temp + '^' + name
+                        temp = list(temp)
+                        temp = '|'.join(temp)
+                        temp = temp + '|' + name
 
                     c.execute("UPDATE quiz SET fail = ? WHERE Quiz = ?",
                               (temp, i[0]))  # 데이터베이스에 저장
                     con.commit()
+                    break
             if ck_answer != 1:
                 sock.send('^NO'.encode())  # 틀렷다고 알려줌
             # 서버에서 보내준 정답을 받을곳
@@ -284,6 +293,16 @@ class Menu:
             msg = msg.replace('quiz/', '')
             c.execute("SELECT Quiz,who,fail FROM quiz")  # 학생들의 문제풀이 상황 가져오기
             for row in c:
+                row = list(row)
+                print(row[2])
+                if row[1] == 'X':
+                    row[1] = '0'
+                else:
+                    row[1] = str(len(row[1]))
+                if row[2] == 'X':
+                    row[2] = '0'
+                else:
+                    row[2] = str(len(row[2]))
                 row = '^'.join(row)
                 s_list.append(row)
             s_list = '|'.join(s_list)

@@ -8,13 +8,13 @@
 # study ~ : 학습하기 관련
 
 import sys
-# import requests
+# import requests  # 이하 모듈 계속 안 쓰면 삭제 예정
 # import random
 from socket import *
 from threading import *
 from PyQt5 import uic
 # from PyQt5 import QtCore
-# from PyQt5.QtGui import *  # 이하 모듈 계속 안 쓰면 삭제 예정
+from PyQt5.QtGui import *
 # from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 # from xml.etree.ElementTree import fromstring
@@ -28,12 +28,10 @@ class Main(QMainWindow, clientui):
         super().__init__()
         self.setupUi(self)
         self.s_skt = socket(AF_INET, SOCK_STREAM)
-        self.s_skt.connect(('127.0.0.1', 25001))
+        self.s_skt.connect(('127.0.0.1', 25000))
         self.stackedWidget.setCurrentIndex(0)
-
         self.flag_t = True
         self.flag_s = True
-
         # 메인 페이지
         self.btn_join.clicked.connect(self.join_start)
         self.btn_login.clicked.connect(self.login_start)
@@ -56,6 +54,7 @@ class Main(QMainWindow, clientui):
         self.btn_t_quiz_back.clicked.connect(self.quiz_back_t)
         self.btn_t_quiz_add.clicked.connect(self.quiz_add)
         self.btn_t_quiz_check.clicked.connect(self.quiz_check)
+        self.line_quiz_add_n.setValidator(QIntValidator(1, 100, self))
         # Q&A 답변 페이지
         self.btn_t_qna_back.clicked.connect(self.qna_back_t)
         self.btn_t_qna_check.clicked.connect(self.qna_check_t)
@@ -79,6 +78,7 @@ class Main(QMainWindow, clientui):
         self.btn_s_quiz_back.clicked.connect(self.quiz_back_s)
         self.btn_s_quiz_list.clicked.connect(self.quiz_list)
         self.btn_s_quiz_solve.clicked.connect(self.quiz_solve)
+        self.btn_s_quiz_point.clicked.connect(self.info_myself)  # 하나만 명명 규칙 예외
         # Q&A 질문 페이지
         self.btn_s_qna_back.clicked.connect(self.qna_back_s)
         self.btn_s_qna_check.clicked.connect(self.qna_check_s)
@@ -290,8 +290,7 @@ class Main(QMainWindow, clientui):
 
     def quiz_add(self):  # 문제 출제 함수
         if not self.line_quiz_add_q.text() or not self.line_quiz_add_a.text() or not self.line_quiz_add_n.text():
-            QMessageBox.warning(self, '입력 누락', '문제와 정답을 모두 입력해야 합니다')
-        # 점수 칸에 숫자만 받도록 구문 넣기
+            QMessageBox.warning(self, '입력 누락', '문제와 정답과 점수를 모두 입력해야 합니다')
         elif '^' in self.line_quiz_add_q.text() or '/' in self.line_quiz_add_q.text()\
                 or '|' in self.line_quiz_add_q.text() or '^' in self.line_quiz_add_a.text()\
                 or '/' in self.line_quiz_add_a.text() or '|' in self.line_quiz_add_a.text():
@@ -302,11 +301,15 @@ class Main(QMainWindow, clientui):
             if '^' in self.line_quiz_add_a.text()\
                     or '/' in self.line_lline_quiz_add_aogin_pw.text() or '|' in self.line_quiz_add_a.text():
                 self.line_quiz_add_a.clear()
+        elif int(self.line_quiz_add_n.text()) > 100:
+            QMessageBox.warning(self, '범위 초과', '점수는 100 이하의 정수여야 합니다')
+            self.line_quiz_add_n.clear()
         else:
             self.s_skt.send(f'^quizadd/{self.line_quiz_add_q.text()}/{self.line_quiz_add_a.text()}/{self.line_quiz_add_n.text()}'.encode())
             QMessageBox.about(self, '문제 등록', '문제가 등록되었습니다')
             self.line_quiz_add_q.clear()
             self.line_quiz_add_a.clear()
+            self.line_quiz_add_n.clear()
 
     def quiz_check(self):  # 전체 문제 보기 함수 (교사측)
         self.text_t_quiz.clear()
@@ -319,7 +322,7 @@ class Main(QMainWindow, clientui):
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
         else:
-            rcvquiz = rcv.decode().split(' | ')
+            rcvquiz = rcv.decode()[:-2].split(' | ')
             for i in rcvquiz:
                 quiz = i.split('^')
                 self.text_t_quiz.append(f'문제 : {quiz[0]}')
@@ -336,10 +339,10 @@ class Main(QMainWindow, clientui):
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
         else:
-            rcvquiz = rcv.decode().split(' | ')
+            rcvquiz = rcv.decode()[:-2].split(' | ')
             for i in rcvquiz:
                 quiz = i.split('^')
-                self.text_t_quiz.append(f'문제 : {quiz[0]}')
+                self.text_s_quiz.append(f'문제 : {quiz[0]}')
 
     def quiz_solve(self):  # 문제 답변 함수
         if not self.line_quiz_solve.text():
@@ -368,11 +371,9 @@ class Main(QMainWindow, clientui):
                 self.line_quiz_solve.clear()
 
     def quiz_back_t(self):  # 문제 출제 페이지 나가기 함수
-        # self.s_skt.send('^quizend/'.encode())
         self.stackedWidget.setCurrentIndex(2)
 
     def quiz_back_s(self):  # 문제 풀기 페이지 나가기 함수
-        # self.s_skt.send('^quizend/'.encode())
         self.stackedWidget.setCurrentIndex(7)
     # 문제 출제/풀기 끝
 
@@ -405,12 +406,14 @@ class Main(QMainWindow, clientui):
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
         else:
-            rcvqna = rcv.decode().split(' | ')
-            for i in range(0, len(rcvqna), 2):
-                if rcvqna[i + 1] != '^none':
-                    self.combo_t_qna.addItem(f'<해결됨> {rcvqna[i]} | {rcvqna[i + 1]}')
+            print(rcv.decode())
+            rcvqna = rcv.decode().split('/')
+            print(rcvqna)
+            for i in rcvqna:
+                if i.split(',')[2] != '^none':
+                    self.combo_t_qna.addItem(f'<해결됨> {i.split(",")[1]} | {i.split(",")[2]}')
                 else:
-                    self.combo_t_qna.addItem(f'<미해결> {rcvqna[i]} | 답변 없음')
+                    self.combo_t_qna.addItem(f'<미해결> {i.split(",")[1]} | 답변 없음')
 
     def qna_check_s(self):  # Q&A 확인 함수 (학생측)
         self.combo_s_qna.clear()
@@ -424,12 +427,12 @@ class Main(QMainWindow, clientui):
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
         else:
-            rcvqna = rcv.decode().split(' | ')
-            for i in range(0, len(rcvqna), 2):
-                if rcvqna[i + 1] != '^none':
-                    self.combo_s_qna.addItem(f'<해결됨> {rcvqna[i]} | {rcvqna[i + 1]}')
+            rcvqna = rcv.decode().split('/')
+            for i in rcvqna:
+                if i.split(',')[2] != '^none':
+                    self.combo_s_qna.addItem(f'<해결됨> {i.split(",")[1]} | {i.split(",")[2]}')
                 else:
-                    self.combo_s_qna.addItem(f'<미해결> {rcvqna[i]} | 답변 없음')
+                    self.combo_s_qna.addItem(f'<미해결> {i.split(",")[1]} | 답변 없음')
 
     def qna_view_t(self):  # Q&A 목록 선택 시 표시 함수 (교사측)
         if self.combo_t_qna.currentText()[:5] == '<해결됨>':
@@ -510,9 +513,9 @@ class Main(QMainWindow, clientui):
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == '^NO':  # no 신호 정해야 됨
+        if rcv.decode() == '^NO':
             QMessageBox.warning(self, '상담방', '다른 선생님이 상담하고 있습니다')
-        else:  # ok 신호 안 정하면 반드시 터짐
+        else:
             self.stackedWidget_t.setCurrentIndex(1)
             self.text_t_counsel.clear()
             self.line_t_snd.clear()
@@ -527,9 +530,9 @@ class Main(QMainWindow, clientui):
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        if rcv.decode() == '^NO':  # no 신호 정해야 됨
+        if rcv.decode() == '^NO':
             QMessageBox.warning(self, '상담방', '다른 학생이 상담하고 있습니다')
-        else:  # ok 신호 안 정하면 반드시 터짐
+        else:
             self.stackedWidget_s.setCurrentIndex(1)
             self.text_s_counsel.clear()
             self.line_s_snd.clear()
@@ -538,7 +541,6 @@ class Main(QMainWindow, clientui):
             th_s.start()
 
     def counsel_rcv_t(self, s_skt):
-        print(f'교사 수신 스레드 시작 {active_count()}')  # 디버그 - 확인용 메시지
         while self.flag_t:
             rcv_msg = s_skt.recv(1024)
             if not self.flag_t:
@@ -548,10 +550,8 @@ class Main(QMainWindow, clientui):
                 break
             print(f'받은 것 : {rcv_msg.decode()}')  # 디버그 - 확인용 메시지
             self.text_t_counsel.append(rcv_msg.decode())
-        print(f'교사 수신 스레드 종료? {active_count()}')  # 디버그 - 확인용 메시지
 
     def counsel_rcv_s(self, s_skt):
-        print(f'학생 수신 스레드 시작 {active_count()}')  # 디버그 - 확인용 메시지
         while self.flag_s:
             rcv_msg = s_skt.recv(1024)
             if not self.flag_s:
@@ -561,7 +561,6 @@ class Main(QMainWindow, clientui):
                 break
             print(f'받은 것 : {rcv_msg.decode()}')  # 디버그 - 확인용 메시지
             self.text_s_counsel.append(rcv_msg.decode())
-        print(f'학생 수신 스레드 종료? {active_count()}')  # 디버그 - 확인용 메시지
 
     def counsel_snd_t(self):  # 상담 대화 전송 함수 (교사측)
         if not self.line_t_snd.text():
@@ -613,6 +612,9 @@ class Main(QMainWindow, clientui):
         self.stackedWidget.setCurrentIndex(6)
 
     def info_show(self):  # 통계 보기 함수
+        pass
+
+    def info_myself(self):  # 학생측의 자기 통계 보기 함수
         pass
 
     def info_back(self):  # 통계 보기 페이지 나가기 함수

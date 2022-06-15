@@ -11,7 +11,7 @@ class ChatServer:
         self.last_rcv_msg = ''
         self.s_skt = socket(AF_INET, SOCK_STREAM)
         self.ip = ''
-        self.port = 25001
+        self.port = 25000
         self.s_skt.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.s_skt.bind((self.ip, self.port))
         print('클라이언트 접속 대기 중...')
@@ -57,7 +57,7 @@ class ChatServer:
                     if random.randint(1, 2) == 1:
                         self.snd_client('^none')
                     else:
-                        self.snd_client('이것은 문제1 | 이것은 답1 | 이것은 문제2 | 이것은 답2')
+                        self.snd_client('문제1^답1^1^X^X | 문제2^답2^2^X^X | 문제3^답3^3^X^X | ')
                 elif cmd[0] == '^quizlist':
                     if random.randint(1, 2) == 1:
                         self.snd_client('^none')
@@ -72,7 +72,7 @@ class ChatServer:
                     if random.randint(1, 2) == 1:
                         self.snd_client('^none')
                     else:
-                        self.snd_client('질문1 | 답변1 | 질문2 | ^none | 질문3 | 답변3 | 질문4 | ^none')
+                        self.snd_client('이름1,질문1,답변1/이름2,질문2,^none/이름3,질문3,답변3/이름4,질문4,^none')
                 elif cmd[0] == '^counsel':
                     self.snd_client('^OK')
                 elif cmd[0] == '^counselend':

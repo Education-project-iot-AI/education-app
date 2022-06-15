@@ -42,7 +42,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>8</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -1600,6 +1600,19 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_s_quiz_point">
+      <property name="geometry">
+       <rect>
+        <x>825</x>
+        <y>400</y>
+        <width>190</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>총점 확인</string>
       </property>
      </widget>
     </widget>
