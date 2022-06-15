@@ -317,6 +317,7 @@ class Menu:
     def question(msg, info, n):  # QnA 시작
         con, c = dbopen()
         sock = info[n][0]
+        name = info[n][4]
         qna_list = []
         lock.acquire()
         c.execute("SELECT Name,Question,Answer FROM QnA")  # db에서 qna 꺼내기
@@ -329,9 +330,16 @@ class Menu:
                 sock.send(qna_list.encode())
             else:
                 sock.send('^none'.encode())
-        # if msg.startswith('add/'):
-        #    msg = msg.split('/')
-        #    c.execute("SELECT QnA SET answer = ? WHERE =?", (msg[2], msg[1]))
+        if msg.startswith('aadd/'):
+            msg = msg.split('/')
+            c.execute("UPDATE QnA SET Answer = ? WHERE Question = ?",
+                      (msg[2], msg[1]))
+            con.commit()            # DB에 커밋
+        if msg.startswith('qadd/'):
+            msg = msg.replace('qadd/', '')
+            c.execute("INSERT INTO QnA(Name,Question) VALUES(?, ?)",
+                      (name, msg))  # DB에 user_data 추가
+            con.commit()            # DB에 커밋
 
         lock.release()
         con.close()
