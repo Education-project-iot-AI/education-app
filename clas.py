@@ -338,7 +338,7 @@ class Menu:
         if msg.startswith('qadd/'):
             msg = msg.replace('qadd/', '')
             c.execute("INSERT INTO QnA(Name,Question) VALUES(?, ?)",
-                      (name, msg))  # DB에 user_data 추가
+                      (name, msg))  # db에 문제 넣기
             con.commit()            # DB에 커밋
 
         lock.release()
