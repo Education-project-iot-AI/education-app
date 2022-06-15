@@ -5,7 +5,7 @@ import clas
 clnt_sock = []
 clnt_info = []  # [sock, id, type,]
 clnt_cnt = 0
-PORT = 25001
+PORT = 25000
 BUF_SIZE = 1024
 msg = ''
 lock = threading.Lock()
