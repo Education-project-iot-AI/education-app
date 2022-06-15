@@ -5,7 +5,7 @@ import clas
 clnt_sock = []
 clnt_info = []  # [sock, id, type,]
 clnt_cnt = 0
-PORT = 25001
+PORT = 25000
 BUF_SIZE = 1024
 msg = ''
 lock = threading.Lock()
@@ -18,6 +18,7 @@ def delete_imfor(clnt_sock):  # 클라이언트 접속해제
             print('exit client')
             while i < clnt_cnt - 1:
                 clnt_info[i] = clnt_info[i + 1]
+
                 i += 1
             break
     clnt_cnt -= 1
@@ -35,21 +36,18 @@ def handle_clnt(clnt_sock):
 
     while True:
         clnt_msg = clas.Msg.recv(clnt_sock)
-        print(clnt_msg)
         if not clnt_msg:                        # 클라이언트 연결 끊길 시
             lock.acquire()
             delete_imfor(clnt_sock)
             lock.release()
             break
 
-        if clnt_msg.startswith('!'):            # 특정 기능 실행 시 ! 붙여서 받음
-            clnt_msg = clnt_msg.replace('!', '')
+        if clnt_msg.startswith('^'):            # 특정 기능 실행 시 ! 붙여서 받음
+            clnt_msg = clnt_msg.replace('^', '')
             if clnt_msg.startswith('login'):
                 clnt_msg = clnt_msg.replace('login', '')
                 clnt_info = clas.Join_n_login.log_in(
                     clnt_sock, clnt_msg, clnt_info, clnt_num)
-                print(clnt_info)
-                print(clnt_info[0][2])
             if clnt_msg.startswith('join'):
                 clnt_msg = clnt_msg.replace('join', '')
                 clnt_cnt = clas.Join_n_login.join(clnt_sock, clnt_cnt)
@@ -61,9 +59,18 @@ def handle_clnt(clnt_sock):
             if clnt_msg.startswith('study'):
                 clnt_msg = clnt_msg.replace('study', '')
                 clas.Menu.Student_Study(clnt_msg, clnt_info, clnt_num)
+
             if clnt_msg.startswith('info'):
                 clnt_msg = clnt_msg.replace('info', '')
                 clas.Menu.Student_info(clnt_msg, clnt_info, clnt_num)
+
+            if clnt_msg.startswith('counsel'):
+                clnt_msg = clnt_msg.replace('counsel', '')
+                clas.Menu.Sangdam(clnt_msg, clnt_info, clnt_num)
+
+            if clnt_msg.startswith('qna'):
+                clnt_msg = clnt_msg.replace('qna', '')
+                clas.Menu.question(clnt_msg, clnt_info, clnt_num)
         else:
             continue
 
@@ -77,7 +84,7 @@ if __name__ == '__main__':
         clnt_sock, addr = sock.accept()
 
         lock.acquire()
-        clnt_info.insert(clnt_cnt, [clnt_sock, '!log_in', 0])
+        clnt_info.insert(clnt_cnt, [clnt_sock, 0])
         clnt_cnt += 1
         lock.release()
 

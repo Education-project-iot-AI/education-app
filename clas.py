@@ -1,8 +1,11 @@
+from audioop import add
 import sys
 import sqlite3
 import threading
 
 BUF_SIZE = 1024
+s_join = 0
+t_join = 0
 
 lock = threading.Lock()
 
@@ -37,37 +40,34 @@ class Join_n_login:  # 회원가입, 로그인 시작
             imfor = sock.recv(BUF_SIZE)
             imfor = imfor.decode()
 
-            if imfor == "!Q_join":      # 회원가입 창 닫을 때 함수 종료
+            if imfor == "^Q_join":      # 회원가입 창 닫을 때 함수 종료
                 con.close()
                 break
 
-            if '!idcheck/' in imfor:  # 아이디 중복확인
+            if '^idcheck/' in imfor:  # 아이디 중복확인
                 lock.acquire()
-                imfor = imfor.replace('!idcheck/', '')
+                imfor = imfor.replace('^idcheck/', '')
                 c.execute(
                     "SELECT DISTINCT teacher.ID, student.ID From teacher LEFT JOIN student ON teacher.ID != student.ID")
                 for row in c:  # id 컬럼
                     if imfor in row:       # 클라이언트가 입력한 id가 DB에 있으면
-                        sock.send('!no'.encode())
+                        sock.send('^NO'.encode())
                         ck_login = 1
                         break
+                lock.release()
                 if ck_login == 1:
                     continue
-                lock.release()
-                sock.send('!ok'.encode())  # 중복된 id 없으면 !OK 전송
+                print('d')
+                sock.send('^ok'.encode())  # 중복된 id 없으면 !OK 전송
             # 중복확인 종료
 
-            if imfor.startswith('!joindata/'):
+            if imfor.startswith('^joindata/'):
                 lock.acquire()
-                imfor = imfor.replace('!joindata/', '')
+                imfor = imfor.replace('^joindata/', '')
                 imfor = imfor.split('/')  # 구분자 /로 잘라서 리스트 생성
-
-                print(imfor)
 
                 for i in range(3):
                     user_data.append(imfor[i])       # user_data 리스트에 추가
-
-                print(user_data)
 
                 if 's' in imfor[3]:
                     query = "INSERT INTO student(ID, PW, name) VALUES(?, ?, ?)"
@@ -96,7 +96,7 @@ class Join_n_login:  # 회원가입, 로그인 시작
         user_pw = c.fetchone()             # 한 행 추출
 
         if not user_pw:  # DB에 없는 id 입력시
-            sock.send('!no'.encode())
+            sock.send('^NO'.encode())
             con.close()
             return
 
@@ -109,14 +109,26 @@ class Join_n_login:  # 회원가입, 로그인 시작
                           (user_id,))
                 study = list(c.fetchone())
                 study = ','.join(study)
+                study = '^OK/'+study
                 clnt_info[n].append(data[0])
                 sock.send(study.encode())  # 현재까지 공부한 내용을 전송
             else:
                 clnt_info[n].append(data[0])
-                sock.send('!OK'.encode())
+                sock.send('^OK'.encode())
+            if 's' in data[0]:
+                c.execute("SELECT name FROM student WHERE ID=?",
+                          (user_id,))
+            else:
+                c.execute("SELECT name FROM teacher WHERE ID=?",
+                          (user_id,))
+            temp = list(c.fetchone())
+            print(temp)
+            name = ''.join(temp)
+            print(name)
+            clnt_info[n].append(name)
         else:
             # 로그인실패 시그널
-            sock.send('!NO'.encode())
+            sock.send('^NO'.encode())
             print("login failure")
         con.close()
         return clnt_info
@@ -125,79 +137,111 @@ class Join_n_login:  # 회원가입, 로그인 시작
 
 class Menu:
     def Quiz(msg, info, n):  # 문제 관련 함수
-        lock.acquire()
         con, c = dbopen()
         sock = info[n][0]
-        Q_msg = ''
-        print(info)
+        name = info[n][4]
+        id = info[n][2]
+        ck_answer = 0
+        Quiz_list = []
+        Quizs = ''
+        # 문제/답/점수/현재까지 정답을 말한 인원을 가져온다
+        c.execute("SELECT Quiz,Answer,point,who,fail FROM quiz")
+        for row in c:
+            print(row)
+            row = ','.join(row)
+            Quizs = Quizs + row + ' | '  # 하나로 합친다
+        Quiz_list = Quizs.split(' | ')
+        lock.acquire()
         if 'check' in msg:
-            Quizs = ''
-            c.execute("SELECT who,Quiz,Answer FROM quiz")  # 누구에게/문제/답 을 가져온다
-            while True:
-                data = c.fetchone()  # 한 행 추출
-                if data is None:
+            if len(Quizs) > 0:
+                sock.send(Quizs.encode())  # 전송한다
+            else:
+                sock.send('^none'.encode())  # 전송한다
+
+        # 만약 선생이면서 add/를 시작으로 입력이 들어올때
+        if msg.startswith('add/') and 't' == info[n][3]:
+            msg = msg.replace('add/', '')  # aadd를 지워주고
+            msg = msg.split('/')  # 리스트화 시킨뒤
+
+            query = "INSERT INTO quiz(Quiz,Answer,point) VALUES(?, ?, ?)"
+            c.executemany(query, (msg,))  # 데이터베이스에 누가/무슨 문제를/답 을 넣는다
+            con.commit()
+
+        if msg.startswith('start/'):
+            msg = msg.replace('start/', '')  # 문제를 푼다고 할 시
+            msg = msg.split('/')  # 문제/입력한 답을 리스트화
+            for i in Quiz_list:
+                i = i.split(',')
+                if id in i[3]:
+                    sock.send("이미 답을 낸 문제입니다".encode())
                     break
-                data = list(data)
-                quiz = ','.join(data)  # 리스트를 문자열화 킨다
-                Quizs = Quizs + quiz + ' | '  # 하나로 합친다
-            sock.send(Quizs.encode())  # 전송한다
+                if msg[0] == i[0] and msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
+                    c.execute("SELECT point FROM student WHERE ID = ?",
+                              (id,))
+                    addpoint = ''.join(c.fetchone())
+                    addpoint = str(int(addpoint) + int(i[2]))
 
-            Quiz_list = Quizs.split(' | ')  # 문제를 맞출때를 생각하여 미리 문제를 리스트로 나눠둔다
-
-            while True:  # 선생님이 퀴즈를 만들거나 학생이 맞추는 함수
-                Q_msg = sock.recv(BUF_SIZE)
-                Q_msg = Q_msg.decode()
-
-                if Q_msg.startswith('!quizend/'):  # 나간다고 할시
-                    break
-
-                # 만약 선생이면서 !aadd/를 시작으로 입력이 들어올때
-                if Q_msg.startswith('!quizadd/') and 't' == info[n][5]:
-                    Q_msg = Q_msg.replace('!quizadd/', '')  # aadd를 지워주고
-                    Q_msg = Q_msg.split('/')  # 리스트화 시킨뒤
-
-                    query = "INSERT INTO quiz(who,Quiz,Answer) VALUES(?, ?, ?)"
-                    c.executemany(query, (Q_msg,))  # 데이터베이스에 누가/무슨 문제를/답 을 넣는다
+                    c.execute("UPDATE student SET point = ? WHERE id = ?",
+                              (addpoint, id))  # 데이터베이스에 저장
                     con.commit()
-                    break
+                    c.execute("SELECT who FROM quiz")
+                    temp = c.fetchone()
 
-                if Q_msg.startswith('!quizlist/') and 's' == info[n][5]:
-                    Q_msg = Q_msg.replace('!quizlist/', '')
-                    sock.send(Quizs.encode())  # 문제 전송
-
-                if Q_msg.startswith('!quizstart/') and 's' == info[n][5]:
-                    Q_msg = Q_msg.replace('!quizstart/', '')  # 문제를 푼다고 할 시
-                    Q_msg = Q_msg.split('/')  # 문제/입력한 답을 리스트화
-                    for i in Quiz_list:
-                        if Q_msg[0] == i[0] and Q_msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
-                            ck_answer = 1
-                            break
-                    if ck_answer == 1:
-                        sock.send('!OK'.encode())  # 맞췃다고 알려줌
+                    if temp == ('X',):
+                        temp = name
                     else:
-                        sock.send('!NO'.encode())  # 틀렷다고 알려줌
-                    # 서버에서 보내준 정답을 받을곳
+                        temp = '^'.join(c.fetchone())
+                        temp = temp + '^' + name
+
+                    c.execute("UPDATE quiz SET who = ? WHERE Quiz = ?",
+                              (temp, i[0]))  # 데이터베이스에 저장
+                    con.commit()
+
+                    sock.send('^OK'.encode())  # 맞췃다고 알려줌
+                    ck_answer = 1
+                    break
+                else:
+                    c.execute("SELECT fail FROM quiz")
+                    temp = c.fetchone()
+
+                    if temp == ('X',):
+                        temp = name
+                    else:
+                        temp = '^'.join(c.fetchone())
+                        temp = temp + '^' + name
+
+                    c.execute("UPDATE quiz SET fail = ? WHERE Quiz = ?",
+                              (temp, i[0]))  # 데이터베이스에 저장
+                    con.commit()
+            if ck_answer != 1:
+                sock.send('^NO'.encode())  # 틀렷다고 알려줌
+            # 서버에서 보내준 정답을 받을곳
         lock.release()
         con.close()
         # 문제관련 함수 끝
 
     def Student_Study(msg, info, n):  # 학습하기
         con, c = dbopen()
+        id = info[n][2]
         sock = info[n][0]
         lock.acquire()
         if msg.startswith('save/'):
             msg = msg.replace('save/', '')
             c.execute("SELECT study FROM student WHERE ID=?",
-                      (info[n][1],))  # 해당 학생의 공부내용을 불러오기
+                      (id,))
             temp = c.fetchone()
-            temp = ','.join(temp)  # 현재까지 공부한 내용 코드를 문자열로 바꿈
-            temp = temp+','+msg  # 추가될 코드를 문자열에 더함
-            c.executemany("UPDATE Users SET study = ? WHERE id = ?",
-                          (temp, info[1]))  # 데이터베이스에 저장
+            print(temp)
+            if temp == ('X',):
+                temp = msg
+            else:
+                temp = ','.join(temp)  # 현재까지 공부한 내용 코드를 문자열로 바꿈
+                temp = temp+','+msg  # 추가될 코드를 문자열에 더함
+            c.execute("UPDATE student SET study = ? WHERE id = ?",
+                      (temp, id))  # 데이터베이스에 저장
             con.commit()  # db에 커밋
         if msg.startswith('view'):
             c.execute("SELECT study FROM student WHERE ID=?",
-                      (info[1],))  # 해당 학생이 공부한 내용 가져오기
+                      (id,))  # 해당 학생이 공부한 내용 가져오기
             temp = c.fetchone()
             temp = ','.join(temp)  # 문자열로 변경
             sock.send(temp.encode())  # 클라로 보내기
@@ -209,38 +253,112 @@ class Menu:
         con, c = dbopen()
         sock = info[n][0]
         if msg.startswith('list'):
+            S_list = []
             lock.acquire()
             c.execute("SELECT name FROM student")  # 모든 학생들의 이름을 가져와서
-            S_list = c.fetchall()
-            S_list = ','.join(S_list)  # 튜플형태의 학생이름들을 문자열로 변환
+            for row in c:
+                row = ''.join(row)
+                S_list.append(row)
+            S_list = '^'.join(S_list)  # 문자열로 변경
             sock.send(S_list.encode())  # 보내기
             lock.release()
             con.close()
 
-        if msg.startswith('study'):
+        if msg.startswith('study/'):
             lock.acquire()
             msg = msg.replace('study/', '')
             c.execute("SELECT study FROM student WHERE name=?",
                       (msg,))  # 검색된 학생의 지금까지의 공부내용 가져오기
             temp = c.fetchone()
-            if sys.getsizeof(temp) > 0:  # 공부한 내용이 있는지 없는지 확인
-                temp = ','.join(temp)
-            else:
+            print(temp)
+            if temp == ('X',):  # 공부한 내용이 있는지 없는지 확인
                 temp = "현재까지 공부한 내용이 없습니다"
+            else:
+                temp = '^'.join(temp)
             sock.send(temp.encode())
             lock.release()
 
         if msg.startswith('quiz/'):
+            s_list = []
             lock.acquire()
             msg = msg.replace('quiz/', '')
-            c.execute("SELECT name FROM quiz WHERE name=?",
-                      (msg,))  # 검색한 학생의 문제풀이 상황 가져오기
-            temp = c.fetchone()
-            if sys.getsizeof(temp) > 0:  # 있는지 없는지 확인
-                temp = ','.join(temp)
-            else:
-                temp = "현재까지 받은 문제가 없습니다"
-            sock.send(temp.encode())
+            c.execute("SELECT Quiz,who,fail FROM quiz")  # 학생들의 문제풀이 상황 가져오기
+            for row in c:
+                row = '^'.join(row)
+                s_list.append(row)
+            s_list = '|'.join(s_list)
+
+            sock.send(s_list.encode())
             lock.release()
         con.close()
 # 학생 통계 끝
+
+    def Sangdam(msg, info, n):  # 채팅 시작
+        global s_join, t_join
+        sock = info[n][0]
+        msg = ''
+        if s_join != 0 and info[n][3] == 's':  # 상담중인 사람이 있을 시
+            sock.send("^NO".encode())
+            return
+        if t_join != 0 and info[n][3] == 't':
+            sock.send("^NO".encode())
+            return
+        if info[n][3] == 's':
+            s_join = 1
+        else:
+            t_join = 1
+        sock.send("^OK".encode())
+        info[n][1] = 1  # [n][1]이 1인 사람에게만 채팅이 들어감
+        name = info[n][4]
+        print("들어옴")
+        while True:
+            msg = sock.recv(BUF_SIZE)
+            msg = msg.decode()
+
+            if msg.startswith('^counselend') or not msg:  # 나갈때
+                if info[n][3] == 's':
+                    s_join = 0
+                else:
+                    t_join = 0
+                info[n][1] = 0
+                sock.send("^END".encode())
+                break
+
+            for C_sock in info:
+                if C_sock[1] == 1:
+                    if info[n][0] != C_sock[0]:  # 자신에게는 전달하지 않음
+                        C_sock = C_sock[0]
+                        msg = name + ' : ' + msg  # 메세지에 이름 추가
+                        C_sock.send(msg.encode())
+# 채팅 끝
+
+    def question(msg, info, n):  # QnA 시작
+        con, c = dbopen()
+        sock = info[n][0]
+        name = info[n][4]
+        qna_list = []
+        lock.acquire()
+        c.execute("SELECT Name,Question,Answer FROM QnA")  # db에서 qna 꺼내기
+        if msg.startswith('check'):
+            for row in c:
+                row = ','.join(map(str, row))
+                qna_list.append(row)
+            if len(qna_list) > 0:
+                qna_list = '/'.join(qna_list)
+                sock.send(qna_list.encode())
+            else:
+                sock.send('^none'.encode())
+        if msg.startswith('aadd/'):
+            msg = msg.split('/')
+            c.execute("UPDATE QnA SET Answer = ? WHERE Question = ?",
+                      (msg[2], msg[1]))
+            con.commit()            # DB에 커밋
+        if msg.startswith('qadd/'):
+            msg = msg.replace('qadd/', '')
+            c.execute("INSERT INTO QnA(Name,Question) VALUES(?, ?)",
+                      (name, msg))  # db에 문제 넣기
+            con.commit()            # DB에 커밋
+
+        lock.release()
+        con.close()
+# QnA끝

@@ -289,8 +289,9 @@ class Main(QMainWindow, clientui):
         self.line_quiz_solve.clear()
 
     def quiz_add(self):  # 문제 출제 함수
-        if not self.line_quiz_add_q.text() or not self.line_quiz_add_a.text():
+        if not self.line_quiz_add_q.text() or not self.line_quiz_add_a.text() or not self.line_quiz_add_n.text():
             QMessageBox.warning(self, '입력 누락', '문제와 정답을 모두 입력해야 합니다')
+        # 점수 칸에 숫자만 받도록 구문 넣기
         elif '^' in self.line_quiz_add_q.text() or '/' in self.line_quiz_add_q.text()\
                 or '|' in self.line_quiz_add_q.text() or '^' in self.line_quiz_add_a.text()\
                 or '/' in self.line_quiz_add_a.text() or '|' in self.line_quiz_add_a.text():
@@ -302,7 +303,7 @@ class Main(QMainWindow, clientui):
                     or '/' in self.line_lline_quiz_add_aogin_pw.text() or '|' in self.line_quiz_add_a.text():
                 self.line_quiz_add_a.clear()
         else:
-            self.s_skt.send(f'^quizadd/{self.line_quiz_add_q.text()}/{self.line_quiz_add_a.text()}'.encode())
+            self.s_skt.send(f'^quizadd/{self.line_quiz_add_q.text()}/{self.line_quiz_add_a.text()}/{self.line_quiz_add_n.text()}'.encode())
             QMessageBox.about(self, '문제 등록', '문제가 등록되었습니다')
             self.line_quiz_add_q.clear()
             self.line_quiz_add_a.clear()
@@ -319,15 +320,14 @@ class Main(QMainWindow, clientui):
             QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
         else:
             rcvquiz = rcv.decode().split(' | ')
-            for i in range(len(rcvquiz)):
-                if i % 2 == 0:
-                    self.text_t_quiz.append(f'문제 : {rcvquiz[i]}')
-                else:
-                    self.text_t_quiz.append(f'정답 : {rcvquiz[i]}')
+            for i in rcvquiz:
+                quiz = i.split('^')
+                self.text_t_quiz.append(f'문제 : {quiz[0]}')
+                self.text_t_quiz.append(f'정답 : {quiz[1]}')
 
     def quiz_list(self):  # 문제 받기 함수 (학생측)
         self.line_quiz_solve.clear()
-        self.s_skt.send('^quizlist/'.encode())
+        self.s_skt.send('^quizcheck'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
@@ -336,7 +336,10 @@ class Main(QMainWindow, clientui):
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
         else:
-            self.text_s_quiz.setPlainText(f'{rcv.decode()}')
+            rcvquiz = rcv.decode().split(' | ')
+            for i in rcvquiz:
+                quiz = i.split('^')
+                self.text_t_quiz.append(f'문제 : {quiz[0]}')
 
     def quiz_solve(self):  # 문제 답변 함수
         if not self.line_quiz_solve.text():
@@ -464,7 +467,7 @@ class Main(QMainWindow, clientui):
                 or '|' in self.text_t_qna_add.toPlainText():
             QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
         else:
-            self.s_skt.send(f'^aadd/{self.text_t_qna_check.toPlainText().replace("질문 / ", "")}'
+            self.s_skt.send(f'^qnaaadd/{self.text_t_qna_check.toPlainText().replace("질문 / ", "")}'
                             f'/{self.text_t_qna_add.toPlainText()}'.encode())
             qsi = self.combo_t_qna.currentIndex()
             qst = self.combo_t_qna.currentText().split(' | ')
@@ -481,7 +484,7 @@ class Main(QMainWindow, clientui):
                 or '|' in self.text_s_qna_add.toPlainText():
             QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
         else:
-            self.s_skt.send(f'^qadd/{self.text_s_qna_add.toPlainText()}/^none'.encode())
+            self.s_skt.send(f'^qnaqadd/{self.text_s_qna_add.toPlainText()}/^none'.encode())
             self.text_s_qna_add.clear()
 
     def qna_back_t(self):  # Q&A 페이지 나가기 함수 (교사측)
@@ -582,20 +585,17 @@ class Main(QMainWindow, clientui):
 
     def counsel_end_t(self):
         self.s_skt.send('^counselend'.encode())
-        # 스레드 멈추는 구문 필요함
         self.flag_t = False
         self.stackedWidget_t.setCurrentIndex(0)
 
     def counsel_end_s(self):
         self.s_skt.send('^counselend'.encode())
-        # 스레드 멈추는 구문 필요함
         self.flag_s = False
         self.stackedWidget_s.setCurrentIndex(0)
 
     def counsel_back_t(self):  # 상담 받기 페이지 나가기 함수
         if self.stackedWidget_t.currentIndex() == 1:
             self.s_skt.send('^counselend'.encode())
-            # 스레드 멈추는 구문 필요함
             self.flag_t = False
             self.stackedWidget_t.setCurrentIndex(0)
         self.stackedWidget.setCurrentIndex(2)
@@ -603,7 +603,6 @@ class Main(QMainWindow, clientui):
     def counsel_back_s(self):  # 상담 신청 페이지 나가기 함수
         if self.stackedWidget_s.currentIndex() == 1:
             self.s_skt.send('^counselend'.encode())
-            # 스레드 멈추는 구문 필요함
             self.flag_s = False
             self.stackedWidget_s.setCurrentIndex(0)
         self.stackedWidget.setCurrentIndex(7)

@@ -42,7 +42,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>10</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QLabel" name="label">
@@ -765,7 +765,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>520</y>
-        <width>800</width>
+        <width>380</width>
         <height>25</height>
        </rect>
       </property>
@@ -776,7 +776,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>130</y>
         <width>800</width>
-        <height>281</height>
+        <height>271</height>
        </rect>
       </property>
      </widget>
@@ -807,7 +807,9 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;문제, 정답에  /, |, ^를 사용할 수 없습니다&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;문제, 정답에  /, |, ^를 사용할 수 없습니다&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;문제, 정답, 점수가 모두 필요합니다&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="Line" name="line_7">
@@ -834,6 +836,29 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="line_quiz_add_n">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>520</y>
+        <width>380</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>490</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>점수</string>
       </property>
      </widget>
     </widget>
