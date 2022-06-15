@@ -282,15 +282,16 @@ class Menu:
         sock = info[n][0]
         msg = ''
         if s_join != 0 and info[n][3] == 's':  # 상담중인 사람이 있을 시
-            sock.send("다른 학생이 상담하고있습니다".encode())
+            sock.send("^NO".encode())
             return
         if t_join != 0 and info[n][3] == 't':
-            sock.send("다른 선생님이 상담하고있습니다".encode())
+            sock.send("^NO".encode())
             return
         if info[n][3] == 's':
             s_join = 1
         else:
             t_join = 1
+        sock.send("^OK".encode())
         info[n][1] = 1  # [n][1]이 1인 사람에게만 채팅이 들어감
         name = info[n][4]
         print("들어옴")
@@ -304,6 +305,7 @@ class Menu:
                 else:
                     t_join = 0
                 info[n][1] = 0
+                sock.send("^END".encode())
                 break
 
             for C_sock in info:
