@@ -140,8 +140,6 @@ class Menu:
         con, c = dbopen()
         sock = info[n][0]
         name = info[n][4]
-        print(info[n])
-        print(name)
         id = info[n][2]
         ck_answer = 0
         Quiz_list = []
@@ -163,22 +161,22 @@ class Menu:
         # 만약 선생이면서 add/를 시작으로 입력이 들어올때
         if msg.startswith('add/') and 't' == info[n][3]:
             msg = msg.replace('add/', '')  # aadd를 지워주고
-            msg = msg.split('/')  # 리스트화 시킨뒤
+            add_msg = msg.split('/')  # 리스트화 시킨뒤
 
             query = "INSERT INTO quiz(Quiz,Answer,point) VALUES(?, ?, ?)"
-            c.executemany(query, (msg,))  # 데이터베이스에 누가/무슨 문제를/답 을 넣는다
+            c.executemany(query, (add_msg,))  # 데이터베이스에 누가/무슨 문제를/답 을 넣는다
             con.commit()
 
         if msg.startswith('start/'):
             msg = msg.replace('start/', '')  # 문제를 푼다고 할 시
-            msg = msg.split('/')  # 문제/입력한 답을 리스트화
+            S_msg = msg.split('/')  # 문제/입력한 답을 리스트화
             for i in Quiz_list:
                 i = i.split('^')
                 print(i)
                 if id in i[3] or id in i[4]:  # 작동안됨 수정해야함
                     sock.send("이미 답을 낸 문제입니다".encode())
                     break
-                if msg[0] == i[0] and msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
+                if S_msg[0] == i[0] and S_msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
                     c.execute("SELECT point FROM student WHERE ID = ?",
                               (id,))
                     addpoint = ''.join(c.fetchone())
@@ -205,7 +203,7 @@ class Menu:
                     sock.send('^OK'.encode())  # 맞췃다고 알려줌
                     ck_answer = 1
                     break
-                elif msg[0] == i[0] and msg[1] != i[1]:
+                elif S_msg[0] == i[0] and S_msg[1] != i[1]:
                     c.execute("SELECT fail FROM quiz")
                     temp = c.fetchone()
                     print(temp)
@@ -367,14 +365,14 @@ class Menu:
             else:
                 sock.send('^none'.encode())
         if msg.startswith('aadd/'):
-            msg = msg.split('/')
+            a_msg = msg.split('/')
             c.execute("UPDATE QnA SET Answer = ? WHERE Question = ?",
-                      (msg[2], msg[1]))
+                      (a_msg[2], a_msg[1]))
             con.commit()            # DB에 커밋
         if msg.startswith('qadd/'):
-            msg = msg.replace('qadd/', '')
+            q_msg = q_msg.replace('qadd/', '')
             c.execute("INSERT INTO QnA(Name,Question) VALUES(?, ?)",
-                      (name, msg))  # db에 문제 넣기
+                      (name, q_msg))  # db에 문제 넣기
             con.commit()            # DB에 커밋
 
         lock.release()
