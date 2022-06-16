@@ -366,7 +366,7 @@ class Menu:
                       (a_msg[2], a_msg[1]))
             con.commit()            # DB에 커밋
         if msg.startswith('qadd/'):
-            q_msg = q_msg.replace('qadd/', '')
+            q_msg = msg.replace('qadd/', '')
             c.execute("INSERT INTO QnA(Name,Question) VALUES(?, ?)",
                       (name, q_msg))  # db에 문제 넣기
             con.commit()            # DB에 커밋
