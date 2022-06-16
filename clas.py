@@ -101,33 +101,51 @@ class Join_n_login:  # 회원가입, 로그인 시작
             return
 
         if (data[2],) == user_pw:
-            clnt_info[n].append(data[1])
             # 로그인성공 시그널
+            print(len(clnt_info[n]))
             print("login sucess")
-            if 's' in data[0]:  # 학생일 시
-                c.execute("SELECT study FROM student WHERE ID=?",
-                          (user_id,))  # 현재까지 공부내용 가져오기
-                study = list(c.fetchone())
-                study = ','.join(study)
-                study = '^OK/'+study  # 합쳐서 보내주기
-                clnt_info[n].append(data[0])
-                sock.send(study.encode())  # 현재까지 공부한 내용을 전송
+            if len(clnt_info[n]) >= 3:
+                clnt_info[n][2] = data[1]
+                if 's' in data[0]:  # 학생일 시
+                    c.execute("SELECT study FROM student WHERE ID=?",
+                              (user_id,))  # 현재까지 공부내용 가져오기
+                    study = list(c.fetchone())
+                    study = ','.join(study)
+                    study = '^OK/'+study  # 합쳐서 보내주기
+                    clnt_info[n][3] = data[0]
+                    clnt_info[n][4] = data[2]
+                    sock.send(study.encode())  # 현재까지 공부한 내용을 전송
+                else:
+                    clnt_info[n][3] = data[0]
+                    clnt_info[n][4] = data[2]
+                    sock.send('^OK'.encode())
             else:
-                clnt_info[n].append(data[0])
-                sock.send('^OK'.encode())
-            if 's' in data[0]:
-                c.execute("SELECT name FROM student WHERE ID=?",
-                          (user_id,))
-            else:
-                c.execute("SELECT name FROM teacher WHERE ID=?",
-                          (user_id,))
-            temp = list(c.fetchone())
-            name = ''.join(temp)
-            clnt_info[n].append(name)
+                clnt_info[n].append(data[1])
+                if 's' in data[0]:  # 학생일 시
+                    c.execute("SELECT study FROM student WHERE ID=?",
+                              (user_id,))  # 현재까지 공부내용 가져오기
+                    study = list(c.fetchone())
+                    study = ','.join(study)
+                    study = '^OK/'+study  # 합쳐서 보내주기
+                    clnt_info[n].append(data[0])
+                    sock.send(study.encode())  # 현재까지 공부한 내용을 전송
+                else:
+                    clnt_info[n].append(data[0])
+                    sock.send('^OK'.encode())
+                if 's' in data[0]:
+                    c.execute("SELECT name FROM student WHERE ID=?",
+                              (user_id,))
+                else:
+                    c.execute("SELECT name FROM teacher WHERE ID=?",
+                              (user_id,))
+                temp = list(c.fetchone())
+                name = ''.join(temp)
+                clnt_info[n].append(name)
         else:
             # 로그인실패 시그널
             sock.send('^NO'.encode())
             print("login failure")
+        print(clnt_info)
         con.close()
         return clnt_info
 # 로그인 종료
@@ -262,6 +280,7 @@ class Menu:
 
     def Student_info(msg, info, n):  # 학생 통계
         con, c = dbopen()
+        id = info[n][2]
         sock = info[n][0]
         if msg.startswith('list'):
             S_list = []
@@ -311,12 +330,11 @@ class Menu:
             sock.send(s_list.encode())
             lock.release()
         if msg.startswith('myself'):
-            id = info[n][2]
-            lock.acquire()
+            print(id)
             c.execute("SELECT point FROM student Where id = ?",(id,))
             point = ''.join(c.fetchone())
+            print(point)
             sock.send(point.encode())
-            lock.release()
 
         con.close()
 # 학생 통계 끝

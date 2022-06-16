@@ -7,9 +7,11 @@
 # info ~ : 학생 통계 관련
 # study ~ : 학습하기 관련
 
+import re
 import sys
-# import requests  # 이하 모듈 계속 안 쓰면 삭제 예정
-# import random
+import requests  # 이하 모듈 계속 안 쓰면 삭제 예정
+import random
+import sqlite3
 from socket import *
 from threading import *
 from PyQt5 import uic
@@ -17,7 +19,10 @@ from PyQt5 import uic
 from PyQt5.QtGui import *
 # from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-# from xml.etree.ElementTree import fromstring
+from xml.etree.ElementTree import fromstring
+import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 
 clientui = uic.loadUiType("tonghap.ui")[0]
@@ -67,7 +72,8 @@ class Main(QMainWindow, clientui):
         self.btn_t_counsel_ok.clicked.connect(self.counsel_go_t)
         # 통계보기 페이지
         self.btn_t_info_back.clicked.connect(self.info_back)
-        self.btn_t_info_show.clicked.connect(self.info_show)
+        self.btn_t_info_show_1.clicked.connect(self.info_show_1)
+        self.btn_t_info_show_2.clicked.connect(self.info_show_2)
         # 학생 페이지
         self.btn_s_logout.clicked.connect(self.debug_logout)  # 디버그-로그아웃(돌아가기) 연결
         self.btn_s_quiz.clicked.connect(self.quiz_start_s)
@@ -94,6 +100,15 @@ class Main(QMainWindow, clientui):
         self.btn_s_study_on.clicked.connect(self.study_on)
         # 버튼/시그널 연결 끝
         self.btn_login.setDisabled(True)
+        self.birdcodelist = []
+        self.study_list = []
+        # matplotlib 설정 시작
+        self.nationColor = ['red', 'green', 'yellow', 'blue']
+        self.fig = plt.Figure()
+        self.canvas = FigureCanvas(self.fig)
+        self.gridLayout.addWidget(self.canvas)
+        self.ax = self.fig.add_subplot()
+        # matplotlib 설정 끝
 
     # 디버그 시작
     def debug_logout(self):
@@ -118,11 +133,11 @@ class Main(QMainWindow, clientui):
         self.line_join_name.clear()
 
     def join_idcheck(self):  # 아이디 중복 체크 함수
+        join_id = re.sub('[a-zA-Z_!\\d]', '', self.line_join_id.text())
         if not self.line_join_id.text():
             QMessageBox.warning(self, '입력 누락', 'ID를 입력하셔야 합니다')
-        elif ' ' in self.line_join_id.text() or '/' in self.line_join_id.text()\
-                or '|' in self.line_join_id.text() or '^' in self.line_join_id.text():
-            QMessageBox.warning(self, '금지어 포함', '공백, /, |, ^는 사용할 수 없습니다')
+        elif join_id:
+            QMessageBox.warning(self, '금지어 포함', '공백을 제외한 영문 대소문자, 숫자, _, !만 사용할 수 있습니다')
             self.line_join_id.clear()
         else:
             self.s_skt.send(f'^idcheck/{self.line_join_id.text()}'.encode())
@@ -139,32 +154,26 @@ class Main(QMainWindow, clientui):
                 self.line_join_id.clear()
 
     def join_confirm(self):  # 회원 가입 확정 함수
+        join_id = re.sub('[a-zA-Z_!\\d]', '', self.line_join_id.text())
+        join_pw = re.sub('[a-zA-Z_!\\d]', '', self.line_join_pw.text())
+        join_nm = re.sub('[a-zA-Z_!\\d]', '', self.line_join_name.text())
         if not self.line_join_id.text() or not self.line_join_pw.text() or not self.line_join_name.text():
             QMessageBox.warning(self, '입력 누락', '모든 정보를 입력해야 합니다')
-        elif ' ' in self.line_join_id.text() or '/' in self.line_join_id.text()\
-                or '|' in self.line_join_id.text() or '^' in self.line_join_id.text()\
-                or ' ' in self.line_join_pw.text() or '/' in self.line_join_pw.text()\
-                or '|' in self.line_join_pw.text() or '^' in self.line_join_pw.text()\
-                or ' ' in self.line_join_name.text() or '/' in self.line_join_name.text()\
-                or '|' in self.line_join_name.text() or '^' in self.line_join_name.text():
-            QMessageBox.warning(self, '금지어 포함', '공백, /, |, ^는 사용할 수 없습니다')
-            if ' ' in self.line_join_id.text() or '/' in self.line_join_id.text()\
-                    or '|' in self.line_join_id.text() or '^' in self.line_join_id.text():
+        elif join_id or join_pw or join_nm:
+            QMessageBox.warning(self, '금지어 포함', '공백을 제외한 영문 대소문자, 숫자, _, !만 사용할 수 있습니다')
+            if join_id:
                 self.line_join_id.clear()
-            if ' ' in self.line_join_pw.text() or '/' in self.line_join_pw.text()\
-                    or '|' in self.line_join_pw.text() or '^' in self.line_join_pw.text():
+            if join_pw:
                 self.line_join_pw.clear()
-            if ' ' in self.line_join_name.text() or '/' in self.line_join_name.text()\
-                    or '|' in self.line_join_name.text() or '^' in self.line_join_name.text():
+            if join_nm:
                 self.line_join_name.clear()
         elif self.line_join_pw.text() != self.line_join_pw_check.text():
             QMessageBox.warning(self, '비밀번호 불일치', '비밀번호를 다시 한번 확인해 주세요')
-            if ' ' in self.line_join_id.text() or '/' in self.line_join_id.text() or '|' in self.line_join_id.text():
+            if join_id:
                 self.line_join_id.clear()
-            if ' ' in self.line_join_pw.text() or '/' in self.line_join_pw.text() or '|' in self.line_join_pw.text():
+            if join_pw:
                 self.line_join_pw.clear()
-            if ' ' in self.line_join_name.text() or '/' in self.line_join_name.text()\
-                    or '|' in self.line_join_name.text():
+            if join_nm:
                 self.line_join_name.clear()
         else:
             if self.radio_join_t.isChecked():
@@ -210,18 +219,15 @@ class Main(QMainWindow, clientui):
 
     # 로그인 시작
     def login_start(self):  # 로그인 시작 함수
+        login_id = re.sub('[a-zA-Z_!\\d]', '', self.line_login_id.text())
+        login_pw = re.sub('[a-zA-Z_!\\d]', '', self.line_login_pw.text())
         if not self.line_login_id.text() or not self.line_login_pw.text():
             QMessageBox.warning(self, '입력 누락', 'ID와 PW를 모두 입력해야 합니다')
-        elif ' ' in self.line_login_id.text() or '/' in self.line_login_id.text()\
-                or '|' in self.line_login_id.text() or '^' in self.line_login_id.text()\
-                or ' ' in self.line_login_pw.text() or '/' in self.line_login_pw.text()\
-                or '|' in self.line_login_pw.text() or '^' in self.line_login_pw.text():
-            QMessageBox.warning(self, '금지어 포함', '공백, /, |, ^는 사용할 수 없습니다')
-            if ' ' in self.line_login_id.text() or '/' in self.line_login_id.text()\
-                    or '|' in self.line_login_id.text() or '^' in self.line_login_id.text():
+        elif login_id or login_pw:
+            QMessageBox.warning(self, '금지어 포함', '공백을 제외한 영문 대소문자, 숫자, _, !만 사용할 수 있습니다')
+            if login_id:
                 self.line_login_id.clear()
-            if ' ' in self.line_login_pw.text() or '/' in self.line_login_pw.text()\
-                    or '|' in self.line_login_pw.text() or '^' in self.line_login_pw.text():
+            if login_pw:
                 self.line_login_pw.clear()
         elif self.radio_login_t.isChecked():
             self.s_skt.send(f'^logint/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())
@@ -247,7 +253,7 @@ class Main(QMainWindow, clientui):
         else:
             self.s_skt.send(f'^logins/{self.line_login_id.text()}/{self.line_login_pw.text()}'.encode())
             while True:
-                rcv = self.s_skt.recv(16)
+                rcv = self.s_skt.recv(1024)
                 if sys.getsizeof(rcv) > 0:
                     print(f'받은 것 : {rcv.decode()}')  # 디버그-확인용 출력
                     break
@@ -267,7 +273,11 @@ class Main(QMainWindow, clientui):
                 self.line_login_id.clear()
                 self.line_login_pw.clear()
                 self.stackedWidget.setCurrentIndex(7)
-                # self.study_list = rcv  # 수신한 학습 정보를 학습 내역 변수로 이동 (예정)
+                if rcv.decode() == 'X':
+                    pass
+                else:
+                    self.study_list = rcv.decode()[4:].split('|')
+                print(self.study_list)  # 디버그
 
     def login_btn(self):  # 로그인 버튼 활성화 함수
         self.btn_login.setEnabled(True)
@@ -304,7 +314,6 @@ class Main(QMainWindow, clientui):
             QMessageBox.warning(self, '범위 초과', '점수는 100 이하의 정수여야 합니다')
             self.line_quiz_add_n.clear()
         else:
-            # print(f'^quizadd/{self.line_quiz_add_q.text()}/{self.line_quiz_add_a.text()}/{self.line_quiz_add_n.text()}')
             self.s_skt.send(f'^quizadd/{self.line_quiz_add_q.text()}/'
                             f'{self.line_quiz_add_a.text()}/{self.line_quiz_add_n.text()}'.encode())
             QMessageBox.about(self, '문제 등록', '문제가 등록되었습니다')
@@ -354,8 +363,9 @@ class Main(QMainWindow, clientui):
             QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
             self.line_quiz_solve.clear()
         else:
-            print(f'^quizstart/{self.list_s_quiz.currentItem().text()[5:]}/{self.line_quiz_solve.text()}')
-            self.s_skt.send(f'^quizstart/{self.list_s_quiz.currentItem().text()[5:]}/{self.line_quiz_solve.text()}'.encode())
+            print(f'^quizstart/{self.list_s_quiz.currentItem().text()[5:]}/{self.line_quiz_solve.text()}')  # 디버그
+            self.s_skt.send(f'^quizstart/{self.list_s_quiz.currentItem().text()[5:]}/'
+                            f'{self.line_quiz_solve.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(1024)
                 if sys.getsizeof(rcv) > 0:
@@ -407,9 +417,8 @@ class Main(QMainWindow, clientui):
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
         else:
-            print(rcv.decode())
+            QMessageBox.about(self, 'Q&A 갱신', 'Q&A 목록이 갱신되었습니다')
             rcvqna = rcv.decode().split('/')
-            print(rcvqna)
             for i in rcvqna:
                 if i.split(',')[2] != '답변 대기중':
                     self.combo_t_qna.addItem(f'<해결됨> {i.split(",")[1]} | {i.split(",")[2]}')
@@ -428,6 +437,7 @@ class Main(QMainWindow, clientui):
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
         else:
+            QMessageBox.about(self, 'Q&A 갱신', 'Q&A 목록이 갱신되었습니다')
             rcvqna = rcv.decode().split('/')
             for i in rcvqna:
                 if i.split(',')[2] != '답변 대기중':
@@ -612,16 +622,53 @@ class Main(QMainWindow, clientui):
 
     # 통계 보기 시작
     def info_start(self):  # 통계 보기 페이지 진입 함수
+        self.ax.clear()
         self.stackedWidget.setCurrentIndex(6)
 
-    def info_show(self):  # 통계 보기 함수
+    def info_show_1(self):  # 학생별 득점 통계 보기 함수
+        self.ax.clear()
+        x = []
+        y = []
         self.s_skt.send('^infostudy'.encode())
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
                 print(f'받은 것 : {rcv.decode()}')
                 break
-        print(rcv.decode())
+        for i in rcv.decode().split('/'):
+            a = i.split('|')
+            x.append(a[0])
+            y.append(int(a[1]))
+        self.ax.bar(x, y, color=self.nationColor, alpha=0.4)
+        self.ax.set_ylabel("score", fontsize=10, rotation=0, loc='top')
+        self.ax.set_xlabel("student_name", fontsize=10, loc='right')
+        self.ax.set_title("Student score rate", fontsize=14)
+        self.canvas.draw()
+
+    def info_show_2(self):  # 문제별 정/오답 통계 보기 함수
+        self.ax.clear()
+        x = []
+        x_num = 0
+        y = []
+        self.s_skt.send('^infoquiz/'.encode())
+        while True:
+            rcv = self.s_skt.recv(1024)
+            if sys.getsizeof(rcv) > 0:
+                print(f'받은 것 : {rcv.decode()}')
+                break
+        for i in rcv.decode().split('|'):
+            x_num += 1
+            a = i.split('^')
+            x.append(f'Q. {x_num}')
+            if int(a[1]) + int(a[2]) == 0:
+                y.append(0)
+            else:
+                y.append((int(a[1]) / (int(a[1]) + int(a[2]))) * 100)
+        self.ax.plot(x, y, color='red', marker='o')
+        self.ax.set_xlabel("Exam_Question", fontsize=10, loc='right')
+        self.ax.set_ylabel("%", fontsize=15, rotation=0, loc='top')
+        self.ax.set_title("Correct answer rate", fontsize=14)
+        self.canvas.draw()
 
     def info_myself(self):  # 학생측의 자기 통계 보기 함수
         self.s_skt.send('^infomyself'.encode())
@@ -641,39 +688,28 @@ class Main(QMainWindow, clientui):
         self.text_study_name.clear()
         self.text_study_info.clear()
         self.stackedWidget.setCurrentIndex(11)
+        if len(self.birdcodelist) == 0:
+            con = sqlite3.connect('bird.db')
+            cur = con.cursor()
+            cur.execute("select code from birdcode")
+            for i in cur:
+                self.birdcodelist.append(i[0])
+        print('self.birdcodelist :', self.birdcodelist)
 
     def study_on(self):  # 학습하기 함수
-        pass
-        # birdcodelist = ['A000001149', 'A000001150', 'A000001151', 'A000001152', 'A000001153', 'A000001154',
-        #                 'A000001155', 'A000001156', 'A000001160', 'A000001161', 'A000001162', 'A000001164',
-        #                 'A000001165', 'A000001166', 'A000001167', 'A000001168', 'A000001169', 'A000001170',
-        #                 'A000001171', 'A000001172', 'A000001176', 'A000001177', 'A000001178', 'A000001180',
-        #                 'A000001181', 'A000001182', 'A000001183', 'A000001184', 'A000001185', 'A000001188',
-        #                 'A000001189', 'A000001191', 'A000001195', 'A000001197', 'A000001199', 'A000001201',
-        #                 'A000001204', 'A000001205', 'A000001206', 'A000001207', 'A000001209', 'A000001210',
-        #                 'A000001211', 'A000001213', 'A000001216', 'A000001218', 'A000001220', 'A000001221',
-        #                 'A000001222', 'A000001223', 'A000001224', 'A000001225', 'A000001226', 'A000001227',
-        #                 'A000001228', 'A000001229', 'A000001231', 'A000001233', 'A000001235', 'A000001236',
-        #                 'A000001239', 'A000001241', 'A000001243', 'A000001246', 'A000001248', 'A000001250',
-        #                 'A000001251', 'A000001253', 'A000001254', 'A000001255', 'A000001256', 'A000001257',
-        #                 'A000001259', 'A000001260', 'A000001261', 'A000001264', 'A000001265', 'A000001266',
-        #                 'A000001267', 'A000001270', 'A000001271', 'A000001273', 'A000001275', 'A000001279',
-        #                 'A000001280', 'A000001282', 'A000001285', 'A000001287', 'A000001291', 'A000001292',
-        #                 'A000001295', 'A000001299', 'A000001304', 'A000001305', 'A000001306', 'A000001307',
-        #                 'A000001308', 'A000001309', 'A000001310', 'A000001311', 'A000001313', 'A000001316',
-        #                 'A000001317', 'A000001318', 'A000001319', 'A000001320', 'A000001324', 'A000001326',
-        #                 'A000001327', 'A000001328', 'A000001329', 'A000001330', 'A000001333', 'A000001334',
-        #                 'A000001336', 'A000001337', 'A000001338', 'A000001340', 'A000001341', 'A000001344',
-        #                 'A000001347', 'A000001354', 'A000001355', 'A000001357', 'A000001358', 'A000001360',
-        #                 'A000001361', 'A000001362', 'A000001365', 'A000001366', 'A000001367', 'A000001368',
-        #                 'A000001369', 'A000001370', 'A000001371', 'A000001372', 'A000001374', 'A000001376',
-        #                 'A000001377', 'A000001383', 'A000001384', 'A000001386', 'A000001387', 'A000001388',
-        #                 'A000001390', 'A000001391', 'A000001393', 'A000001394', 'A000001395', 'A000001397']
-        # code = random.choice(birdcodelist)
-        # params = {'serviceKey': '9cCN4TXQK/nLX/tkVrz9+4qnPHIyI5sjjCpkfO9kPAH8y6fDcWtxwsp7JM0bozPvZklvvCVKqnZOig81BIMjmw==', 'q1': code}
-        # bird_data = fromstring(requests.get('http://apis.data.go.kr/1400119/BirdService/birdIlstrInfo', params=params).content.decode())
-        # self.text_study_name.setPlainText(bird_data[1][0][6].text)
-        # self.text_study_info.setPlainText(bird_data[1][0][16].text)
+        key = '9cCN4TXQK/nLX/tkVrz9+4qnPHIyI5sjjCpkfO9kPAH8y6fDcWtxwsp7JM0bozPvZklvvCVKqnZOig81BIMjmw=='
+        url = 'http://apis.data.go.kr/1400119/BirdService/birdIlstrInfo'
+        code = random.choice(self.birdcodelist)
+        while code in self.study_list:
+            print('중복! 재추첨!')  # 디버그
+            code = random.choice(self.birdcodelist)
+        print('현재 코드', code)  # 디버그
+        params = {'serviceKey': key, 'q1': code}
+        bird_data = fromstring(requests.get(url, params=params).content.decode())
+        self.text_study_name.setPlainText(bird_data[1][0][6].text)
+        self.text_study_info.setPlainText(bird_data[1][0][16].text)
+        QMessageBox.about(self, '학습 내용 확인', f'이번 학습 대상은 "{bird_data[1][0][6].text}"입니다')
+        self.s_skt.send(f'^studysave/{code}'.encode())
 
     def study_back(self):  # 학습하기 페이지 나가기 함수
         self.stackedWidget.setCurrentIndex(7)
