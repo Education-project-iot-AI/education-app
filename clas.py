@@ -233,12 +233,11 @@ class Menu:
             c.execute("SELECT study FROM student WHERE ID=?",
                       (id,))
             temp = c.fetchone()
-            print(temp)
             if temp == ('X',):
                 temp = msg
             else:
-                temp = ','.join(temp)  # 현재까지 공부한 내용 코드를 문자열로 바꿈
-                temp = temp+','+msg  # 추가될 코드를 문자열에 더함
+                temp = '|'.join(temp)  # 현재까지 공부한 내용 코드를 문자열로 바꿈
+                temp = temp+'|'+msg  # 추가될 코드를 문자열에 더함
             c.execute("UPDATE student SET study = ? WHERE id = ?",
                       (temp, id))  # 데이터베이스에 저장
             con.commit()  # db에 커밋
