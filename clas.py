@@ -104,12 +104,12 @@ class Join_n_login:  # 회원가입, 로그인 시작
             clnt_info[n].append(data[1])
             # 로그인성공 시그널
             print("login sucess")
-            if 's' in data[0]:
+            if 's' in data[0]:  # 학생일 시
                 c.execute("SELECT study FROM student WHERE ID=?",
-                          (user_id,))
+                          (user_id,))  # 현재까지 공부내용 가져오기
                 study = list(c.fetchone())
                 study = ','.join(study)
-                study = '^OK/'+study
+                study = '^OK/'+study  # 합쳐서 보내주기
                 clnt_info[n].append(data[0])
                 sock.send(study.encode())  # 현재까지 공부한 내용을 전송
             else:
@@ -122,9 +122,7 @@ class Join_n_login:  # 회원가입, 로그인 시작
                 c.execute("SELECT name FROM teacher WHERE ID=?",
                           (user_id,))
             temp = list(c.fetchone())
-            print(temp)
             name = ''.join(temp)
-            print(name)
             clnt_info[n].append(name)
         else:
             # 로그인실패 시그널
@@ -173,7 +171,7 @@ class Menu:
             for i in Quiz_list:
                 i = i.split('^')
                 print(i)
-                if id in i[3] or id in i[4]:  # 작동안됨 수정해야함
+                if S_msg[0] == i[0] and id in i[3] or id in i[4]:
                     sock.send("이미 답을 낸 문제입니다".encode())
                     break
                 if S_msg[0] == i[0] and S_msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
@@ -185,9 +183,8 @@ class Menu:
                     c.execute("UPDATE student SET point = ? WHERE id = ?",
                               (addpoint, id))  # 데이터베이스에 저장
                     con.commit()
-                    c.execute("SELECT who FROM quiz")
+                    c.execute("SELECT who FROM quiz Where Quiz = ?", (i[0],))
                     temp = c.fetchone()
-                    print(temp)
 
                     if temp == ('X',):
                         temp = name
@@ -291,18 +288,18 @@ class Menu:
             c.execute("SELECT Quiz,who,fail FROM quiz")  # 학생들의 문제풀이 상황 가져오기
             for row in c:
                 row = list(row)
-                print(row[2])
                 if row[1] == 'X':
                     row[1] = '0'
                 else:
-                    row[1] = str(len(row[1]))
+                    row[1] = str(len(row[1].split('|')))  # 현재까지 문제를 맞춘 학생
                 if row[2] == 'X':
                     row[2] = '0'
                 else:
-                    row[2] = str(len(row[2]))
+                    row[2] = str(len(row[2].split('|')))    # 현재까지 문제를 틀린 학생
                 row = '^'.join(row)
                 s_list.append(row)
             s_list = '|'.join(s_list)
+            print(s_list)
 
             sock.send(s_list.encode())
             lock.release()
