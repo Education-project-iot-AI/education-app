@@ -1,27 +1,15 @@
-# 범례
-# join ~ : 회원 가입 관련
-# login ~ : 로그인 관련
-# quiz ~ : 문제 출제/풀기 관련
-# qna ~ : qna 답변/질문 관련
-# counsel ~ : 상담받기/신청 관련
-# info ~ : 학생 통계 관련
-# study ~ : 학습하기 관련
-
 import re
 import sys
-import requests  # 이하 모듈 계속 안 쓰면 삭제 예정
+import requests
 import random
 import sqlite3
 from socket import *
 from threading import *
 from PyQt5 import uic
-# from PyQt5 import QtCore
 from PyQt5.QtGui import *
-# from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from xml.etree.ElementTree import fromstring
 import matplotlib.pyplot as plt
-# from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 
@@ -50,7 +38,7 @@ class Main(QMainWindow, clientui):
         self.radio_join_s.pressed.connect(self.join_btn)
         self.line_join_id.textChanged.connect(self.join_btn2)
         # 교사 페이지
-        self.btn_t_logout.clicked.connect(self.debug_logout)  # 디버그-로그아웃(돌아가기) 연결
+        self.btn_t_logout.clicked.connect(self.logout)
         self.btn_t_quiz.clicked.connect(self.quiz_start_t)
         self.btn_t_qna.clicked.connect(self.qna_start_t)
         self.btn_t_counsel.clicked.connect(self.counsel_start_t)
@@ -75,7 +63,7 @@ class Main(QMainWindow, clientui):
         self.btn_t_info_show_1.clicked.connect(self.info_show_1)
         self.btn_t_info_show_2.clicked.connect(self.info_show_2)
         # 학생 페이지
-        self.btn_s_logout.clicked.connect(self.debug_logout)  # 디버그-로그아웃(돌아가기) 연결
+        self.btn_s_logout.clicked.connect(self.logout)
         self.btn_s_quiz.clicked.connect(self.quiz_start_s)
         self.btn_s_qna.clicked.connect(self.qna_start_s)
         self.btn_s_counsel.clicked.connect(self.counsel_start_s)
@@ -110,10 +98,8 @@ class Main(QMainWindow, clientui):
         self.ax = self.fig.add_subplot()
         # matplotlib 설정 끝
 
-    # 디버그 시작
-    def debug_logout(self):
+    def logout(self):
         self.stackedWidget.setCurrentIndex(0)
-    # 디버그 끝
 
     # 회원 가입 시작
     def join_start(self):  # 회원 가입 페이지 진입 함수
@@ -144,7 +130,6 @@ class Main(QMainWindow, clientui):
             while True:
                 rcv = self.s_skt.recv(16)
                 if sys.getsizeof(rcv) > 0:
-                    print(f'받은 것 : {rcv.decode()}')  # 디버그-확인용 출력
                     break
             if rcv.decode() == '^ok':
                 QMessageBox.about(self, '사용 가능 ID', '사용이 가능한 ID입니다')
@@ -234,7 +219,6 @@ class Main(QMainWindow, clientui):
             while True:
                 rcv = self.s_skt.recv(16)
                 if sys.getsizeof(rcv) > 0:
-                    print(f'받은 것 : {rcv.decode()}')  # 디버그-확인용 출력
                     break
             if rcv.decode() == '^OK':
                 QMessageBox.about(self, '로그인 성공', '로그인을 환영합니다')
@@ -255,7 +239,6 @@ class Main(QMainWindow, clientui):
             while True:
                 rcv = self.s_skt.recv(1024)
                 if sys.getsizeof(rcv) > 0:
-                    print(f'받은 것 : {rcv.decode()}')  # 디버그-확인용 출력
                     break
             if rcv.decode() == '^NO':
                 QMessageBox.warning(self, '로그인 실패', 'ID와 PW를 다시 확인해 주세요')
@@ -277,7 +260,6 @@ class Main(QMainWindow, clientui):
                     pass
                 else:
                     self.study_list = rcv.decode()[4:].split('|')
-                print(self.study_list)  # 디버그
 
     def login_btn(self):  # 로그인 버튼 활성화 함수
         self.btn_login.setEnabled(True)
@@ -327,7 +309,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
@@ -345,7 +326,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 문제가 없습니다')
@@ -363,13 +343,11 @@ class Main(QMainWindow, clientui):
             QMessageBox.warning(self, '금지어 포함', '/, |, ^는 사용할 수 없습니다')
             self.line_quiz_solve.clear()
         else:
-            print(f'^quizstart/{self.list_s_quiz.currentItem().text()[5:]}/{self.line_quiz_solve.text()}')  # 디버그
             self.s_skt.send(f'^quizstart/{self.list_s_quiz.currentItem().text()[5:]}/'
                             f'{self.line_quiz_solve.text()}'.encode())
             while True:
                 rcv = self.s_skt.recv(1024)
                 if sys.getsizeof(rcv) > 0:
-                    print(f'받은 것 : {rcv.decode()}')
                     break
             if rcv.decode() == '^OK':
                 QMessageBox.about(self, '결과', '정답입니다')
@@ -412,7 +390,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
@@ -432,7 +409,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '^none':
             QMessageBox.warning(self, '자료 없음', '등록된 Q&A가 없습니다')
@@ -522,7 +498,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '^NO':
             QMessageBox.warning(self, '상담방', '다른 선생님이 상담하고 있습니다')
@@ -539,7 +514,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         if rcv.decode() == '^NO':
             QMessageBox.warning(self, '상담방', '다른 학생이 상담하고 있습니다')
@@ -551,26 +525,22 @@ class Main(QMainWindow, clientui):
             self.flag_s = True
             th_s.start()
 
-    def counsel_rcv_t(self, s_skt):
+    def counsel_rcv_t(self, s_skt):  # 상담 수신 스레드 (교사측)
         while self.flag_t:
             rcv_msg = s_skt.recv(1024)
             if not self.flag_t:
                 break
             if not rcv_msg:
-                print('연결 종료')
                 break
-            print(f'받은 것 : {rcv_msg.decode()}')  # 디버그 - 확인용 메시지
             self.text_t_counsel.append(f'학생 : {rcv_msg.decode()}')
 
-    def counsel_rcv_s(self, s_skt):
+    def counsel_rcv_s(self, s_skt):  # 상담 수신 스레드 (학생측)
         while self.flag_s:
             rcv_msg = s_skt.recv(1024)
             if not self.flag_s:
                 break
             if not rcv_msg:
-                print('연결 종료')
                 break
-            print(f'받은 것 : {rcv_msg.decode()}')  # 디버그 - 확인용 메시지
             self.text_s_counsel.append(f'교사 : {rcv_msg.decode()}')
 
     def counsel_snd_t(self):  # 상담 대화 전송 함수 (교사측)
@@ -595,12 +565,12 @@ class Main(QMainWindow, clientui):
             self.s_skt.send(self.line_s_snd.text().encode())
             self.line_s_snd.clear()
 
-    def counsel_end_t(self):
+    def counsel_end_t(self):  # 상담 종료 함수 (교사측)
         self.s_skt.send('^counselend'.encode())
         self.flag_t = False
         self.stackedWidget_t.setCurrentIndex(0)
 
-    def counsel_end_s(self):
+    def counsel_end_s(self):  # 상담 종료 함수 (학생측)
         self.s_skt.send('^counselend'.encode())
         self.flag_s = False
         self.stackedWidget_s.setCurrentIndex(0)
@@ -633,7 +603,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         for i in rcv.decode().split('/'):
             a = i.split('|')
@@ -654,7 +623,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(1024)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         for i in rcv.decode().split('|'):
             x_num += 1
@@ -675,7 +643,6 @@ class Main(QMainWindow, clientui):
         while True:
             rcv = self.s_skt.recv(32)
             if sys.getsizeof(rcv) > 0:
-                print(f'받은 것 : {rcv.decode()}')
                 break
         QMessageBox.about(self, '총점 확인', f'당신의 점수는 {rcv.decode()}입니다')
 
@@ -694,16 +661,13 @@ class Main(QMainWindow, clientui):
             cur.execute("select code from birdcode")
             for i in cur:
                 self.birdcodelist.append(i[0])
-        print('self.birdcodelist :', self.birdcodelist)
 
     def study_on(self):  # 학습하기 함수
         key = '9cCN4TXQK/nLX/tkVrz9+4qnPHIyI5sjjCpkfO9kPAH8y6fDcWtxwsp7JM0bozPvZklvvCVKqnZOig81BIMjmw=='
         url = 'http://apis.data.go.kr/1400119/BirdService/birdIlstrInfo'
         code = random.choice(self.birdcodelist)
         while code in self.study_list:
-            print('중복! 재추첨!')  # 디버그
             code = random.choice(self.birdcodelist)
-        print('현재 코드', code)  # 디버그
         params = {'serviceKey': key, 'q1': code}
         bird_data = fromstring(requests.get(url, params=params).content.decode())
         self.text_study_name.setPlainText(bird_data[1][0][6].text)
