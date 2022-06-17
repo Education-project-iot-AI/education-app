@@ -57,7 +57,6 @@ class Join_n_login:  # 회원가입, 로그인 시작
                 lock.release()
                 if ck_login == 1:
                     continue
-                print('d')
                 sock.send('^ok'.encode())  # 중복된 id 없으면 !OK 전송
             # 중복확인 종료
 
@@ -102,7 +101,6 @@ class Join_n_login:  # 회원가입, 로그인 시작
 
         if (data[2],) == user_pw:
             # 로그인성공 시그널
-            print(len(clnt_info[n]))
             print("login sucess")
             if len(clnt_info[n]) >= 3:
                 clnt_info[n][2] = data[1]
@@ -145,7 +143,6 @@ class Join_n_login:  # 회원가입, 로그인 시작
             # 로그인실패 시그널
             sock.send('^NO'.encode())
             print("login failure")
-        print(clnt_info)
         con.close()
         return clnt_info
 # 로그인 종료
@@ -163,7 +160,6 @@ class Menu:
         # 문제/답/점수/현재까지 정답을 말한 인원을 가져온다
         c.execute("SELECT Quiz,Answer,point,who,fail FROM quiz")
         for row in c:
-            print(row)
             row = '^'.join(row)
             Quizs = Quizs + row + ' | '  # 하나로 합친다
         Quiz_list = Quizs.split(' | ')
@@ -178,7 +174,6 @@ class Menu:
         if msg.startswith('add/') and 't' == info[n][3]:
             msg = msg.replace('add/', '')  # aadd를 지워주고
             add_msg = msg.split('/')  # 리스트화 시킨뒤
-            # print(add_msg)
 
             query = "INSERT INTO quiz(Quiz,Answer,point) VALUES(?, ?, ?)"
             c.executemany(query, (add_msg,))  # 데이터베이스에 누가/무슨 문제를/답 을 넣는다
@@ -187,17 +182,11 @@ class Menu:
         if msg.startswith('start/'):
             msg = msg.replace('start/', '')  # 문제를 푼다고 할 시
             S_msg = msg.split('/')  # 문제/입력한 답을 리스트화
-            print(S_msg)
             for i in Quiz_list:
                 i = i.split('^')
-                print(i)
                 if S_msg[0] == i[0] and id in i[3] or id in i[4]:
                     ck_answer = 2
                     break
-                print('S_msg[0] :', S_msg[0])
-                print('i[0]', i[0])
-                print('S_msg[1] :', S_msg[1])
-                print('i[1]', i[1])
                 if S_msg[0] == i[0] and S_msg[1] == i[1]:  # 현재 가지고있는 문제와 답이 일치할 시
                     c.execute("SELECT point FROM student WHERE ID = ?",
                               (id,))
@@ -227,7 +216,6 @@ class Menu:
                 elif S_msg[0] == i[0] and S_msg[1] != i[1]:
                     c.execute("SELECT fail FROM quiz")
                     temp = c.fetchone()
-                    print(temp)
 
                     if temp == ('X',):
                         temp = name
@@ -297,13 +285,12 @@ class Menu:
         if msg.startswith('study'):
             lock.acquire()
             s_list = []
-            c.execute("SELECT name,point FROM student")  # 검색된 학생의 지금까지의 공부내용 가져오기
+            # 검색된 학생의 지금까지의 공부내용 가져오기
+            c.execute("SELECT name,point FROM student")
             for row in c:
-                print(row)
                 temp = '|'.join(row)
                 s_list.append(temp)
             s_list = '/'.join(s_list)
-            print(s_list)
             sock.send(s_list.encode())
             lock.release()
 
@@ -325,15 +312,12 @@ class Menu:
                 row = '^'.join(row)
                 s_list.append(row)
             s_list = '|'.join(s_list)
-            print(s_list)
 
             sock.send(s_list.encode())
             lock.release()
         if msg.startswith('myself'):
-            print(id)
-            c.execute("SELECT point FROM student Where id = ?",(id,))
+            c.execute("SELECT point FROM student Where id = ?", (id,))
             point = ''.join(c.fetchone())
-            print(point)
             sock.send(point.encode())
 
         con.close()
@@ -356,7 +340,6 @@ class Menu:
         sock.send("^OK".encode())
         info[n][1] = 1  # [n][1]이 1인 사람에게만 채팅이 들어감
         name = info[n][4]
-        print("들어옴")
         while True:
             msg = sock.recv(BUF_SIZE)
             msg = msg.decode()

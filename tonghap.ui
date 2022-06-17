@@ -45,7 +45,7 @@
      <string notr="true">background-color: rgb(46, 52, 54);</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QPushButton" name="btn_login">
@@ -58,7 +58,12 @@
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">QPushButton{
+	color: rgb(46, 52, 54);
+	background-color: white;
+	border: 2px solid rgb(46, 52, 54);
+	border-radius: 20px;
+}</string>
       </property>
       <property name="text">
        <string>로그인</string>
@@ -74,7 +79,12 @@
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">QPushButton{
+	color: rgb(46, 52, 54);
+	background-color: white;
+	border: 2px solid rgb(46, 52, 54);
+	border-radius: 20px;
+}</string>
       </property>
       <property name="text">
        <string>회원가입</string>
@@ -96,7 +106,7 @@
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>240</x>
         <y>90</y>
         <width>67</width>
         <height>17</height>
@@ -112,7 +122,7 @@
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>240</x>
         <y>140</y>
         <width>67</width>
         <height>17</height>
@@ -151,7 +161,10 @@
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">
+color: rgb(255, 255,255);
+background-color: white;
+border-radius: 0px;</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -159,19 +172,6 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QRadioButton" name="radio_login_s">
-       <property name="geometry">
-        <rect>
-         <x>160</x>
-         <y>10</y>
-         <width>111</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>학생 회원</string>
-       </property>
-      </widget>
       <widget class="QRadioButton" name="radio_login_t">
        <property name="geometry">
         <rect>
@@ -182,10 +182,30 @@
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);</string>
+        <string notr="true">
+color: rgb(0, 0, 0);
+background-color: white;</string>
        </property>
        <property name="text">
         <string>교사 회원</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radio_login_s">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>10</y>
+         <width>111</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+color: rgb(0, 0, 0);
+background-color: white;</string>
+       </property>
+       <property name="text">
+        <string>학생 회원</string>
        </property>
       </widget>
      </widget>
@@ -407,12 +427,16 @@ background-color: rgb(255, 255, 255);</string>
        <rect>
         <x>420</x>
         <y>100</y>
-        <width>81</width>
+        <width>91</width>
         <height>25</height>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">
+	color: rgb(46, 52, 54);
+	background-color: white;
+	border: 2px solid rgb(46, 52, 54);
+	border-radius: 10px;</string>
       </property>
       <property name="text">
        <string>ID 중복 확인</string>
@@ -428,7 +452,12 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">
+	color: rgb(46, 52, 54);
+	background-color: white;
+	border: 2px solid rgb(46, 52, 54);
+	border-radius: 10px;
+</string>
       </property>
       <property name="text">
        <string>회원 가입</string>
@@ -444,7 +473,12 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">
+	color: rgb(46, 52, 54);
+	background-color: white;
+	border: 2px solid rgb(46, 52, 54);
+	border-radius: 10px;
+</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -488,7 +522,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">
+color: rgb(255, 255,255);
+background-color: white;
+border-radius: 0px;</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -505,6 +542,9 @@ p, li { white-space: pre-wrap; }
          <height>23</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
+       </property>
        <property name="text">
         <string>학생 회원</string>
        </property>
@@ -517,6 +557,9 @@ p, li { white-space: pre-wrap; }
          <width>112</width>
          <height>23</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);</string>
        </property>
        <property name="text">
         <string>교사 회원</string>
@@ -563,7 +606,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>문제 출제</string>
@@ -579,7 +625,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>학생 통계</string>
@@ -595,7 +644,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>로그아웃</string>
@@ -611,7 +663,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>Q n A 답변</string>
@@ -627,7 +682,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+border: 2px solid rgb(255, 255, 255);
+border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>상담 하기</string>
@@ -645,7 +703,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 10px;</string>
       </property>
       <property name="text">
        <string>문제 출제</string>
@@ -661,7 +722,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -677,7 +741,9 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 10px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_6">
@@ -722,7 +788,9 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 10px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
      <widget class="QTextBrowser" name="text_t_quiz">
@@ -735,7 +803,9 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_t_quiz_check">
@@ -748,7 +818,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>문제 확인</string>
@@ -764,7 +837,9 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -788,7 +863,9 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 10px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_8">
@@ -819,8 +896,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(238, 238, 236);
-background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>Q n A 답변</string>
@@ -836,8 +915,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(238, 238, 236);
-background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -853,8 +934,10 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(238, 238, 236);
-background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>QnA 새로고침</string>
@@ -870,7 +953,8 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(238, 238, 236);
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 5px;
 background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
@@ -898,7 +982,8 @@ selection-color: rgb(0, 0, 0);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(238, 238, 236);
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
 background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="readOnly">
@@ -915,7 +1000,8 @@ background-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(238, 238, 236);
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
 background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="html">
@@ -938,7 +1024,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -973,14 +1062,17 @@ p, li { white-space: pre-wrap; }
        <widget class="QPushButton" name="btn_t_counsel_ok">
         <property name="geometry">
          <rect>
-          <x>230</x>
-          <y>200</y>
-          <width>190</width>
-          <height>25</height>
+          <x>200</x>
+          <y>160</y>
+          <width>271</width>
+          <height>141</height>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 10px;</string>
         </property>
         <property name="text">
          <string>상담 수락</string>
@@ -998,7 +1090,9 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="line_t_snd">
@@ -1011,7 +1105,9 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(0, 0, 0);
+border-radius: 10px;
+background-color: rgb(255, 255, 255);</string>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_t_snd">
@@ -1024,7 +1120,10 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 10px;</string>
         </property>
         <property name="text">
          <string>보내기</string>
@@ -1040,7 +1139,10 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 10px;</string>
         </property>
         <property name="text">
          <string>상담 종료</string>
@@ -1060,7 +1162,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -1090,7 +1195,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>학생별 득점 통계</string>
@@ -1106,7 +1214,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>문제별 정/오답 통계</string>
@@ -1124,7 +1235,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>상담받기</string>
@@ -1140,7 +1254,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>문제 풀기</string>
@@ -1156,7 +1273,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>로그아웃</string>
@@ -1172,7 +1292,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>학습하기</string>
@@ -1188,7 +1311,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>Q n A 질문</string>
@@ -1206,7 +1332,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>문제 풀기</string>
@@ -1222,7 +1351,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -1238,7 +1370,9 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_s_quiz_list">
@@ -1251,7 +1385,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>문제 받기</string>
@@ -1267,7 +1404,9 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1287,7 +1426,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>총점 확인</string>
@@ -1303,7 +1445,9 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
     </widget>
@@ -1318,7 +1462,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>Q n A 질문</string>
@@ -1334,7 +1481,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -1350,7 +1500,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>QnA 새로고침</string>
@@ -1380,7 +1533,9 @@ selection-color: rgb(0, 0, 0);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 5px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
      <widget class="QTextEdit" name="text_s_qna_add">
@@ -1393,7 +1548,9 @@ selection-color: rgb(0, 0, 0);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
     </widget>
@@ -1408,7 +1565,10 @@ selection-color: rgb(0, 0, 0);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -1443,14 +1603,17 @@ selection-color: rgb(0, 0, 0);</string>
        <widget class="QPushButton" name="btn_s_counsel_call">
         <property name="geometry">
          <rect>
-          <x>230</x>
-          <y>200</y>
-          <width>190</width>
-          <height>25</height>
+          <x>200</x>
+          <y>160</y>
+          <width>271</width>
+          <height>141</height>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
         </property>
         <property name="text">
          <string>상담 신청</string>
@@ -1468,7 +1631,9 @@ selection-color: rgb(0, 0, 0);</string>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="line_s_snd">
@@ -1481,7 +1646,9 @@ selection-color: rgb(0, 0, 0);</string>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(0, 0, 0);
+border-radius: 10px;
+background-color: rgb(255, 255, 255);</string>
         </property>
        </widget>
        <widget class="QPushButton" name="btn_s_snd">
@@ -1494,7 +1661,10 @@ selection-color: rgb(0, 0, 0);</string>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 10px;</string>
         </property>
         <property name="text">
          <string>보내기</string>
@@ -1510,7 +1680,10 @@ selection-color: rgb(0, 0, 0);</string>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);</string>
+         <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 10px;</string>
         </property>
         <property name="text">
          <string>상담 종료</string>
@@ -1530,7 +1703,10 @@ selection-color: rgb(0, 0, 0);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>돌아가기</string>
@@ -1546,7 +1722,10 @@ selection-color: rgb(0, 0, 0);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(85, 87, 83);
+	border: 2px solid rgb(255, 255, 255);
+	border-radius: 15px;</string>
       </property>
       <property name="text">
        <string>학습 자료 보기</string>
@@ -1562,7 +1741,9 @@ selection-color: rgb(0, 0, 0);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
      <widget class="QTextBrowser" name="text_study_info">
@@ -1575,7 +1756,9 @@ selection-color: rgb(0, 0, 0);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">color: rgb(0, 0, 0);
+border-radius: 15px;
+background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_27">
